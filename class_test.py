@@ -5,7 +5,6 @@ class User:
         self.password = password
         credentials = [self.name, self.password]
 
-
     def sign_in(self, name, password):
         if name == self.name and password == self.password:
             #Open another window with access to the library
@@ -16,7 +15,6 @@ class User:
 
     def return_in(self, book):
         return #To do
-
 
 class Book:
     '''Defines the books with their attributes'''
@@ -30,8 +28,8 @@ class Book:
     def __repr__(self):
         return f"({self.isbn}, {self.title}, {self.author}, {self.stock})"
 
-
 class Library:
+    ''''''
     def __init__(self, books):
         self.books = []
 
@@ -67,7 +65,6 @@ class Library:
     def remove_book(self):
         return #To do??? IDK if it's going to be useful.I mean a good library is a big library right?
 
-
     def add_stock(self, book):
         return #To do
 
@@ -90,9 +87,14 @@ def main():
     library.update()
     print(library)
 
+library = Library([])
+book = Book(123,"jgjgj", "jgjgjg", 0)
+library.add_book(book)
+library.update()
+print(library)
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+    #main()
 
 
 

@@ -1,4 +1,9 @@
 from tkinter import *
+from tkinter.ttk import *
+class DatabaseApp:
+    def __init__(self, root):
+        self.root = root
+
 
 
 class App:
@@ -9,8 +14,8 @@ class App:
     loan_placeholder = ("Find by Isbn:", "Find by Title:")
     def __init__(self, root):
         self.root = root
-        root.title("Library Management System")
-        root.geometry("900x900")
+        self.root.title("Library Management System")
+        self.root.geometry("900x900")
     #Defines the main-frame and packs it into the screen:
         self.frame = Frame(root)
         self.frame.pack()
@@ -62,7 +67,7 @@ class App:
         self.return_button = Button(self.frame, text="Return")
         self.return_button.grid(row=1, column=4)
 
-#kill button (for develiping purposes only)
+    #kill button (for develiping purposes only)
         self.kill = Button(self.frame, text="KILL", font=("Ariel", 20), command=self.kill)
         self.kill.grid(row=10, column=0, columnspan=10)
 
@@ -71,8 +76,13 @@ class App:
 
     #Adds a new book to the database every time "Add book" button is being pressed:
     def add_book_database(self):
-        book_data = ""
+        add_window = Toplevel(master)
+        add_window.title("Database Work")
+
     #Takes the inputs of the 5 entries and stores them into a string with commas:
+    #The whole code underneath will be executed seperetely in the DatabaseApp
+        '''
+        book_data = ""
         for i in range(5):
             book_data += self.add_book_entries[i].get() + ","
             self.add_book_entries[i].delete(0,END)
@@ -90,12 +100,11 @@ class App:
             self.error_label.config(text="The isbn or the total stock inputs are invalid, Try again: ")
         
         if len(str(isbn).strip(" ")) == 13:
-                #try:
-                #Takes the inputs to a list and then passes them into database.txt:
+            #Takes the inputs to a list and then passes them into database.txt:
             atributes = [str(isbn), title, author, summary, str(stock)]
-            book = "(|)".join(atributes) + "\n"
+            book = "\t".join(atributes) + "\n"
 
-                #Passes the data to the databases part:
+            #Passes the data to the databases part:
             database = open("database.txt", "a", encoding="utf-8")
             database.write(book)
             database.close()
@@ -103,7 +112,7 @@ class App:
         
         else:
             text_error = f"The isbn input is invalid, Try again: {str(isbn).strip(' ')}"
-            self.error_label.config(text=text_error)
+            self.error_label.config(text=text_error)'''
         
     def search(self):
         #Search button function
