@@ -1,0 +1,8 @@
+#1: if isbn exists in database(for looped for line-by-line check) then:
+        database_app = DatabaseApp()
+        This app adds new books to the database. The existing add_book method on app just
+        updates the attributes on the books already in Library
+
+#2: how to open new window with a button in tkinter
+
+#3: 
