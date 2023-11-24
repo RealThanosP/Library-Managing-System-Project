@@ -44,7 +44,7 @@ class Library:
         return f"{self.books}"
 
 
-    def start(self):
+    def update(self):
         #Loads up the new library from a database.txt to a list self.books
         with open("database.txt", "r", encoding="utf-8") as database:
             for line in database:
@@ -67,9 +67,9 @@ class Library:
                 attributes = [str(book.isbn), book.title, book.author, str(book.stock)]
                 book_str = "\t".join(attributes) + "\n"#The book attributes in a line seperated by tab spaces
 
-        #Adds a new book only when it's not in the database
-        if str(book) in str(self.books): pass
-        else: database.write(book_str)
+            #Adds a new book only when it's not in the database
+                if str(book) in str(self.books): pass
+                else: database.write(book_str)
 
     def remove_book(self):
         return #To do??? IDK if it's going to be useful.I mean a good library is a big library right?
@@ -94,8 +94,9 @@ def ask_book():
 
 def main():
     library = Library([])
-    library.start()
+    library.update()
     library.add_book(ask_book())
+    library.update()
     print(library)
 
 
