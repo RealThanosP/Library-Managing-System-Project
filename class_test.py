@@ -1,19 +1,18 @@
 class User:
-    '''Creates a user that can interact with the library'''
-    def __init__(self, name, password):
-        self.name = name
-        self.password = password
-        credentials = [self.name, self.password]
+    '''Creates a user that can interact with the library'''
+    def __init__(self, name, password):
+        self.name = name
+        self.password = password
+        credentials = [self.name, self.password]
 
 
-    def sign_in(self, name, password):
-        if name == self.name and password == self.password:
-            #Open another window with access to the library
-            pass
+    def sign_in(self, name, password):
+        if name == self.name and password == self.password:
+            #Open another window with access to the library
+            pass
 
     def loan_out(self, book):
         return #To do
-
 
     def return_in(self, book):
         return #To do
