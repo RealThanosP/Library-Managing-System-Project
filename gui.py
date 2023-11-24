@@ -24,8 +24,6 @@ class App:
         self.search_button = Button(self.frame, text="Search")
         self.search_button.grid(row=0, column=5)
 
-    
-
 #Adding-book-section:
     #Add-a-book-button
         self.add_button = Button(self.frame, text="Add Book", command=self.add_book_database)
@@ -59,18 +57,10 @@ class App:
             self.loan_input.grid(row=i,column=3,sticky="w")
             self.loan_book_entries.append(self.loan_input)
             
-    
-
-
-
-
 #Return-book-section:
     #Return-button:
         self.return_button = Button(self.frame, text="Return")
         self.return_button.grid(row=1, column=4)
-
-
-
 
 #kill button (for develiping purposes only)
         self.kill = Button(self.frame, text="KILL", font=("Ariel", 20), command=self.kill)
@@ -118,10 +108,6 @@ class App:
     def search(self):
         #Search button function
         return
-
-
-
-
 
 
 if __name__ == "__main__":
