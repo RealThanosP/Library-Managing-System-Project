@@ -5,4 +5,5 @@
 
 #2: how to open new window with a button in tkinter(That's with ttk TopLabel class)
 
-#3: 
+#3: Add a feature in the editBook section that makes it so only isbn and title entries are shown at first. When you press the button to edit:
+pops the other ones on the same window. If (isbn or title) == blank or (isbn and/or title) is in database then pop the AddBookPopUp
