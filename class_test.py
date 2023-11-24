@@ -35,14 +35,8 @@ class Library:
     def __init__(self, books):
         self.books = []
 
-
-    def __str__(self):
-        return f"{self.books}"
-
-
     def __repr__(self):
         return f"{self.books}"
-
 
     def update(self):
         #Loads up the new library from a database.txt to a list self.books
@@ -58,7 +52,6 @@ class Library:
                 book = Book(isbn, title, author, stock)
                 self.books.append(book)
         return self.books
-
 
     def add_book(self, book):
         #Adds a book to the database.txt and the list books of the library
@@ -83,8 +76,6 @@ class Library:
 
     def find(self, book):
         return #To do
-
-
 
 def ask_book():
     user_input = input("Enter book attributes seperated by tabs(isbn, title, author, stock): ")
