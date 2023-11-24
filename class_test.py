@@ -9,7 +9,7 @@ class User:
         if name == self.name and password == self.password:
             #Open another window with access to the library
             pass
-
+ 
     def loan_out(self, book):
         return #To do
 
