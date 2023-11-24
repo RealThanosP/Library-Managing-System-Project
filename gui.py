@@ -44,8 +44,8 @@ class AddBookPopApp:
         self.addButton.grid(row=5,column=1, columnspan=3)
 
     #Error Label at the bottom 
-        self.error_label = tk.Label(self.frame, text="")
-        self.error_label.grid(row=6, column=0, columnspan=3)
+        self.errorLabel = tk.Label(self.frame, text="")
+        self.errorLabel.grid(row=6, column=0, columnspan=3)
     
     #Function for the SUMBIT button
     def addBook(self):
@@ -65,9 +65,7 @@ class AddBookPopApp:
             stock = int(book_data[3])
         #Just makes sure isbn and the remaining items are integers:
         except ValueError:
-            self.error_label.config(text="The data you entered are invalid\n Try again: ")
-        
-        
+            self.errorLabel.config(text="The data you entered are invalid\n Try again: ")
         
         #Takes the inputs to a list and then passes them into database.txt:
         #Passes the data to the databases part:
@@ -78,11 +76,10 @@ class AddBookPopApp:
             database = open("database.txt", "a", encoding="utf-8")
             database.write(book)
             database.close()
-            self.error_label.config(text="Book Added ✔️")
+            self.errorLabel.config(text="Book Added ✔️")
         except UnboundLocalError:
-            self.error_label.config(text="Fill all the required fields")
+            self.errorLabel.config(text="Fill all the required fields")
 
-   
 class App:
     add_book_entries = []
     loan_book_entries = []
@@ -99,20 +96,20 @@ class App:
 
     #Search-bar-section:
     #Search-bar:
-        self.search_bar = tk.Entry(self.frame, borderwidth=5, width = 90)
-        self.search_bar.grid(row=0, column=0, columnspan=5)
+        self.searchBar = tk.Entry(self.frame, borderwidth=5, width = 90)
+        self.searchBar.grid(row=0, column=0, columnspan=5)
 
     #Search-button:
-        self.search_button = tk.Button(self.frame, text="Search")
-        self.search_button.grid(row=0, column=5)
+        self.searchButton = tk.Button(self.frame, text="Search")
+        self.searchButton.grid(row=0, column=5)
 
     #Adding-book-section:
     #Add-a-book-button
-        self.add_button = tk.Button(self.frame, text="Add Book", command=self.add_book_database)
-        self.add_button.grid(row=1, column=0, columnspan=2)
+        self.editBook = tk.Button(self.frame, text="Add Book", command=self.editBookDetails)
+        self.editBook.grid(row=1, column=0, columnspan=2)
     #Error-text-label:
-        self.error_label = tk.Label(self.frame)
-        self.error_label.grid(row=7,column=0, columnspan=2)
+        self.errorLabel = tk.Label(self.frame)
+        self.errorLabel.grid(row=7,column=0, columnspan=2)
     #The inputs for the atributes of the new book:
         for i in range(0,5):
         #Creates 5 input fielsds to fill:
@@ -126,8 +123,8 @@ class App:
 
     #Loaning-book-section:
     #Loan-book-button
-        self.loan_button = tk.Button(self.frame, text="Loan")
-        self.loan_button.grid(row=1, column=2,columnspan=2)
+        self.loanButton = tk.Button(self.frame, text="Loan")
+        self.loanButton.grid(row=1, column=2,columnspan=2)
     #Loan-labels:
         for i in range(2,4):
             self.loan_label = tk.Label(self.frame, text=self.loan_placeholder[i-2],width=4)
@@ -151,50 +148,32 @@ class App:
     def kill(self):
         self.root.destroy()
 
-    #Adds a new book to the database every time "Add book" button is being pressed:
-    def add_book_database(self):
-        master = tk.Toplevel(self.root)
-        newWindow = AddBookPopApp(master)
-        master.mainloop()
-    #Takes the inputs of the 5 entries and stores them into a string with commas:
-    #The whole code underneath will be executed seperetely in the DatabaseApp
-        '''
-        book_data = ""
-        for i in range(5):
-            book_data += self.add_book_entries[i].get() + ","
-            self.add_book_entries[i].delete(0,END)
-        
-        book_data = book_data.split(",")
-        try:
-        #Checks the input's correctness:
-            isbn = int(book_data[0])
-            title = book_data[1]
-            author = book_data[2]
-            summary = book_data[3]
-            stock = int(book_data[4])
-        #Just makes sure isbn and the remaining items are integers:
-        except ValueError:
-            self.error_label.config(text="The isbn or the total stock inputs are invalid, Try again: ")
-        
-        if len(str(isbn).strip(" ")) == 13:
-            #Takes the inputs to a list and then passes them into database.txt:
-            atributes = [str(isbn), title, author, summary, str(stock)]
-            book = "\t".join(atributes) + "\n"
+    def editBookDetails(self):
+        '''Opens a new window, that's just for adding new books to database.txt, when 'Add Book' button is pressed and isbn is not in database
+        and handles all the desired changes of the selected title'''
+        with open("database.txt", "r", encoding="utf-8") as database:
+            found = False
+            for book in database:
+                book = book.split("\t")
+                #Checks if the Isbn entry input is already in the database.txt
+                if self.add_book_entries[0].get() == book[0]:
+                    found = True
 
-            #Passes the data to the databases part:
-            database = open("database.txt", "a", encoding="utf-8")
-            database.write(book)
-            database.close()
-            self.error_label.config(text="Book Added ✔️")
-        
-        else:
-            text_error = f"The isbn input is invalid, Try again: {str(isbn).strip(' ')}"
-            self.error_label.config(text=text_error)'''
+                if found: break#Prematurely terminates the for-loop to make the process kind of faster
+
+                #Checks if the Isbn entry input is empty
+                if not self.add_book_entries[0].get():
+                    found = True
+                    self.errorLabel.config(text="Fill all the required fields")
+                    break
+        if not found:
+            master = tk.Toplevel(self.root)
+            newWindow = AddBookPopApp(master)
+            master.mainloop()
         
     def search(self):
-        #Search button function
+        '''Search button function'''
         return
-
 
 if __name__ == "__main__":
     root = tk.Tk()
