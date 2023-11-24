@@ -3,6 +3,6 @@
         This app adds new books to the database. The existing add_book method on app just
         updates the attributes on the books already in Library
 
-#2: how to open new window with a button in tkinter
+#2: how to open new window with a button in tkinter(That's with ttk TopLabel class)
 
 #3: 
