@@ -1,8 +1,40 @@
 import tkinter as tk
+from tkinter import messagebox
 from tkinter import ttk
 
-class AddBookPopApp:
+class EditBookPopApp:
     editBookEntries = []
+    add_placeholder = ("Isbn:", "Title:", "Author:", "Stock:")
+
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Edit Book Info")
+        self.root.geometry("270x300")
+
+        #Main frame:
+        self.frame = tk.Frame(self.root)
+        self.frame.pack()
+
+        #Title Label
+        self.titleLabel = tk.Label(self.frame, 
+                                text="Edit Book", 
+                                justify="center",
+                                font=("Helvetica",20))
+        self.titleLabel.grid(row=0, column=0, columnspan=2)
+        
+    #Entries for the book data inputs
+        for i in range(4):
+        #Creates 5 input fielsds to fill:
+            self.editBookField = tk.Entry(self.frame, borderwidth=5, width=25)
+            self.editBookField.grid(row=i+1, column=1, sticky="w")
+        #Adds all the entries to a list to be used later to extract the data:
+            self.editBookEntries.append(self.editBookField)
+        #Create the pointing labels to the entries:
+            self.editBookLabel = tk.Label(self.frame, text=self.add_placeholder[i], justify="right")
+            self.editBookLabel.grid(row=i+1, column=0, sticky="we")
+
+class AddBookPopApp:
+    addBookEntries = []
     add_placeholder = ("Isbn:", "Title:", "Author:", "Stock:")
 
     def __init__(self, root):
@@ -24,13 +56,13 @@ class AddBookPopApp:
     #Entries for the book data inputs
         for i in range(4):
         #Creates 5 input fielsds to fill:
-            self.editBookField = tk.Entry(self.frame, borderwidth=5, width=25)
-            self.editBookField.grid(row=i+1, column=1, sticky="w")
+            self.addBookField = tk.Entry(self.frame, borderwidth=5, width=25)
+            self.addBookField.grid(row=i+1, column=1, sticky="w")
         #Adds all the entries to a list to be used later to extract the data:
-            self.editBookEntries.append(self.editBookField)
+            self.addBookEntries.append(self.addBookField)
         #Create the pointing labels to the entries:
-            self.editBookLabel = tk.Label(self.frame, text=self.add_placeholder[i], justify="right")
-            self.editBookLabel.grid(row=i+1, column=0, sticky="we")
+            self.addBookLabel = tk.Label(self.frame, text=self.add_placeholder[i], justify="right")
+            self.addBookLabel.grid(row=i+1, column=0, sticky="we")
 
     #Add Button
         self.addButton = tk.Button(self.frame, 
@@ -49,8 +81,8 @@ class AddBookPopApp:
         book_data = ""
         #The for-loop that Gives access to the entries separetely
         for i in range(4):
-            book_data += self.editBookEntries[i].get() + "\n"
-            self.editBookEntries[i].delete(0,"end")
+            book_data += self.addBookEntries[i].get() + "\n"
+            self.addBookEntries[i].delete(0,"end")
         
         book_data = book_data.split("\n")
 
@@ -73,16 +105,19 @@ class AddBookPopApp:
             database = open("database.txt", "a", encoding="utf-8")
             database.write(book)
             database.close()
-            self.errorLabel.config(text="Book Added ✔️")
+            messagebox.showinfo(title="A Message", message="Book Added ✔")
+            self.root.destroy()
         except UnboundLocalError:
             self.errorLabel.config(text="Fill all the required fields")
+        
 
 class App:
     editBookEntries = []
     loanBookEntries = []
 
-    edit_placeholder = ("Isbn:", "Title:", "Author:", "Summary:", "Stock:")
+    edit_placeholder = ("Isbn:", "Title:", "Author:", "Section:", "Stock:")
     loan_placeholder = ("Find by Isbn:", "Find by Title:")
+
     def __init__(self, root):
         self.root = root
         self.root.title("Library Management System")
@@ -100,42 +135,25 @@ class App:
         self.searchButton = tk.Button(self.frame, text="Search")
         self.searchButton.grid(row=0, column=5)
 
-    #Adding-book-section:
-    #Add-a-book-button
-        self.editBook = tk.Button(self.frame, text="Edit Book", command=self.editBookDetails)
-        self.editBook.grid(row=1, column=0, columnspan=2)
+    #Adding/Edit-book-section:
+    #Edit Book-button
+        self.editBook = tk.Button(self.frame, text="Edit Book", command=self.editBookDetails, width=10, height=2)
+        self.editBook.grid(row=1, column=0, pady=20)
+    #Add Book-button
+        self.addBook = tk.Button(self.frame, text="Add Book", command=self.addNewBook, width=10, height=2)
+        self.addBook.grid(row=2, column=0, pady=20)
+
     #Error-text-label:
         self.errorLabel = tk.Label(self.frame)
         self.errorLabel.grid(row=7,column=0, columnspan=2)
-    #The inputs for the atributes of the new book:
-        for i in range(0,5):
-        #Creates 5 input fielsds to fill:
-            self.editBookField = tk.Entry(self.frame, borderwidth=5, width=25)
-            self.editBookField.grid(row=i+2, column=1, sticky="w")
-        #Adds all the entries to a list to be used later to extract the data:
-            self.editBookEntries.append(self.editBookField)
-        #Create the pointing labels to the entries:
-            self.editBookLabel = tk.Label(self.frame, text=self.edit_placeholder[i], justify="right")
-            self.editBookLabel.grid(row=i+2, column=0, sticky="we")
-
     #Loaning-book-section:
     #Loan-book-button
-        self.loanButton = tk.Button(self.frame, text="Loan")
+        self.loanButton = tk.Button(self.frame, text="Loan", width=10, height=2)
         self.loanButton.grid(row=1, column=2,columnspan=2)
-        #Loan-labels:
-        for i in range(2,4):
-            self.loanLabel = tk.Label(self.frame, text=self.loan_placeholder[i-2])
-            self.loanLabel.grid(row=i, column=2, sticky="we")
-    
-    #Loan-book-field:
-        for i in range(2,4):
-            self.loanBookField = tk.Entry(self.frame, borderwidth=5, width=25)
-            self.loanBookField.grid(row=i,column=3,sticky="w")
-            self.loanBookEntries.append(self.loanBookField)
             
     #Return-book-section:
     #Return-button:
-        self.returnButton = tk.Button(self.frame, text="Return")
+        self.returnButton = tk.Button(self.frame, text="Return", width=10, height=2)
         self.returnButton.grid(row=1, column=4)
 
     #kill button (for develiping purposes only)
@@ -146,27 +164,31 @@ class App:
         self.root.destroy()
 
     def editBookDetails(self):
-        '''Opens a new window, that's just for adding new books to database.txt, when 'Add Book' button is pressed and isbn is not in database
-        and handles all the desired changes of the selected title'''
-        with open("database.txt", "r", encoding="utf-8") as database:
-            found = False
-            for book in database:
-                book = book.split("\t")
-                #Checks if the Isbn entry input is already in the database.txt
-                if self.editBookEntries[0].get() == book[0]:
-                    found = True
+        
+        masterEdit = tk.Toplevel(self.root)
+        newWindow = EditBookPopApp(masterEdit)
+        masterEdit.mainloop()
 
-                if found: break#Prematurely terminates the for-loop to make the process kind of faster
+    def addNewBook(self):
+        '''Opens a new window, that's just for adding new books to database.txt and handles all the desired changes of the selected title'''
+        # with open("database.txt", "r", encoding="utf-8") as database:
+        #     found = False
+        #     for book in database:
+        #         book = book.split("\t")
+        #         #Checks if the Isbn entry input is already in the database.txt
+        #         if self.editBookEntries[0].get() == book[0]:
+        #             found = True
 
-                #Checks if the Isbn entry input is empty
-                if not self.editBookEntries[0].get():
-                    found = True
-                    self.errorLabel.config(text="Fill all the required fields")
-                    break
-        if not found:
-            master = tk.Toplevel(self.root)
-            newWindow = AddBookPopApp(master)
-            master.mainloop()
+        #         if found: break#Prematurely terminates the for-loop to make the process kind of faster
+
+        #         #Checks if the Isbn entry input is empty and prints an error
+        #The above code is not useful in this method.It can be used in the EditPopUp/AddPopUp to check if a given title is already in the library
+        masterAdd = tk.Toplevel(self.root)
+        newWindow = AddBookPopApp(masterAdd)
+        masterAdd.mainloop()
+        
+            
+
         
     def search(self):
         '''Search button function'''

@@ -19,14 +19,19 @@ class User:
 class Book:
     '''Defines the books with their attributes'''
     #Attributes of the book:
-    def __init__(self, isbn, title, author,stock=0):
+    def __init__(self, isbn, title, author, section, stock=0):
         self.isbn = isbn
         self.title = title
         self.author = author
+        self.section = section #A float (ex. 341.54) which indicates the section of the book based on the dewy decimal system 
         self.stock = stock
 
     def __repr__(self):
         return f"({self.isbn}, {self.title}, {self.author}, {self.stock})"
+
+    def sectionPointer(self, sectionDecimal):
+        '''Takes as input a decimal number and matches it with a pretty string of the section of the library (ex. 101.2-->'Euclidian Geometry')'''
+        return
 
 class Library:
     ''''''
@@ -37,7 +42,7 @@ class Library:
         return f"{self.books}"
 
     def update(self):
-        #Loads up the new library from a database.txt to a list self.books
+        '''Updates the content of the list of books based on the database'''
         with open("database.txt", "r", encoding="utf-8") as database:
             for line in database:
                 line = line.strip().split("\t")
@@ -87,14 +92,9 @@ def main():
     library.update()
     print(library)
 
-library = Library([])
-book = Book(123,"jgjgj", "jgjgjg", 0)
-library.add_book(book)
-library.update()
-print(library)
 
-#if __name__ == "__main__":
-    #main()
+if __name__ == "__main__":
+    main()
 
 
 
