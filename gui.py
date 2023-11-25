@@ -4,7 +4,7 @@ from tkinter import ttk
 
 class EditBookPopApp:
     editBookEntries = []
-    add_placeholder = ("Isbn:", "Title:", "Author:", "Stock:")
+    add_placeholder = ("Isbn:", "Title:", "Author:", "Section:", "Stock:")
 
     def __init__(self, root):
         self.root = root
@@ -23,7 +23,7 @@ class EditBookPopApp:
         self.titleLabel.grid(row=0, column=0, columnspan=2)
         
     #Entries for the book data inputs
-        for i in range(4):
+        for i in range(5):
         #Creates 5 input fielsds to fill:
             self.editBookField = tk.Entry(self.frame, borderwidth=5, width=25)
             self.editBookField.grid(row=i+1, column=1, sticky="w")
@@ -33,9 +33,64 @@ class EditBookPopApp:
             self.editBookLabel = tk.Label(self.frame, text=self.add_placeholder[i], justify="right")
             self.editBookLabel.grid(row=i+1, column=0, sticky="we")
 
+    #Find Button
+        self.findButton = tk.Button(self.frame, text="Find", 
+                                    pady=15, padx=15,
+                                    font=("Helvetica", 18),
+                                    command=self.editBook)
+        self.findButton.grid(row=6,column=0)
+
+    #Submit Button
+        self.submitButton = tk.Button(self.frame, text="Submit", 
+                                    pady=15, padx=15,
+                                    font=("Helvetica", 18),
+                                    command=self.submitChanges)
+        self.submitButton.grid(row=6,column=1)
+
+    #Error-Label
+        self.errorLabel = tk.Label(self.frame, text="")
+        self.errorLabel.grid(row=7, column=0, columnspan=2)
+    def editBook(self):
+
+        def updateEntries():
+            #Deletes whatever you wrote
+            for i in range(0, len(self.editBookEntries)-1):
+                self.editBookEntries[i].delete(0, "end")
+
+            #Prints the info from database on the entries
+            for entryIndex, attribute in enumerate(book):
+                self.editBookEntries[entryIndex].insert(0, attribute)
+
+        #Gets the inputs form the entries
+        isbn = self.editBookEntries[0].get()
+        title = self.editBookEntries[1].get()
+        author = self.editBookEntries[2].get()
+        section = self.editBookEntries[3].get()
+        stock = self.editBookEntries[4].get()
+
+        with open("database.txt", "r", encoding="utf-8") as database:
+            found = False
+            for book in database:
+                book = book.strip().split("\t")
+                #Checks if the Isbn entry input is already in the database.txt
+                if isbn == book[0] or (title == book[1] and author == book[2]):
+                    found = True
+                    print(book)
+                if found: break
+
+        if found: 
+            updateEntries()
+        else:
+            self.errorLabel.config(text="This book isn't in the library's database")
+        
+
+
+    def submitChanges(self):
+        return
+
 class AddBookPopApp:
     addBookEntries = []
-    add_placeholder = ("Isbn:", "Title:", "Author:", "Stock:")
+    add_placeholder = ("Isbn:", "Title:", "Author:", "Section:", "Stock:")
 
     def __init__(self, root):
         self.root = root
@@ -54,7 +109,7 @@ class AddBookPopApp:
         self.topLabel.grid(row=0, column=0, columnspan=2)
 
     #Entries for the book data inputs
-        for i in range(4):
+        for i in range(5): ##NOTE CHANGE THIS TO FIT THE SECTION ATTRIBUTE OF THE BOOKS 
         #Creates 5 input fielsds to fill:
             self.addBookField = tk.Entry(self.frame, borderwidth=5, width=25)
             self.addBookField.grid(row=i+1, column=1, sticky="w")
@@ -70,17 +125,21 @@ class AddBookPopApp:
                                     pady=15, padx=15,
                                     font=("Helvetica", 18),
                                     command=self.addBook)
-        self.addButton.grid(row=5,column=1, columnspan=3)
+        self.addButton.grid(row=6,column=1, columnspan=3)
 
     #Error Label at the bottom 
         self.errorLabel = tk.Label(self.frame, text="")
-        self.errorLabel.grid(row=6, column=0, columnspan=3)
+        self.errorLabel.grid(row=7, column=0, columnspan=3)
+    
+
+        self.closeButton = tk.Button(self.frame, text="Close", command=self.close)
+        self.closeButton.grid(row=7, column=1, columnspan=2)
     
     #Function for the SUMBIT button
     def addBook(self):
         book_data = ""
         #The for-loop that Gives access to the entries separetely
-        for i in range(4):
+        for i in range(5):
             book_data += self.addBookEntries[i].get() + "\n"
             self.addBookEntries[i].delete(0,"end")
         
@@ -91,7 +150,8 @@ class AddBookPopApp:
             isbn = int(book_data[0])
             title = book_data[1]
             author = book_data[2]
-            stock = int(book_data[3])
+            section = int(book_data[3])
+            stock = int(book_data[4])
         #Just makes sure isbn and the remaining items are integers:
         except ValueError:
             self.errorLabel.config(text="The data you entered are invalid\n Try again: ")
@@ -100,23 +160,21 @@ class AddBookPopApp:
         #Passes the data to the databases part:
             #List of attributes of the book
         try:
-            atributes = [str(isbn), title, author, str(stock)]
+            atributes = [str(isbn), title, author, str(section),str(stock)]
             book = "\t".join(atributes) + "\n"
             database = open("database.txt", "a", encoding="utf-8")
             database.write(book)
             database.close()
             messagebox.showinfo(title="A Message", message="Book Added ✔")
-            self.root.destroy()
         except UnboundLocalError:
             self.errorLabel.config(text="Fill all the required fields")
+    
+    def close(self):
+        self.root.destroy()
         
-
 class App:
     editBookEntries = []
     loanBookEntries = []
-
-    edit_placeholder = ("Isbn:", "Title:", "Author:", "Section:", "Stock:")
-    loan_placeholder = ("Find by Isbn:", "Find by Title:")
 
     def __init__(self, root):
         self.root = root
@@ -164,31 +222,16 @@ class App:
         self.root.destroy()
 
     def editBookDetails(self):
-        
+        '''Opens a new Window that's for a editing book attributes'''
         masterEdit = tk.Toplevel(self.root)
         newWindow = EditBookPopApp(masterEdit)
         masterEdit.mainloop()
 
     def addNewBook(self):
         '''Opens a new window, that's just for adding new books to database.txt and handles all the desired changes of the selected title'''
-        # with open("database.txt", "r", encoding="utf-8") as database:
-        #     found = False
-        #     for book in database:
-        #         book = book.split("\t")
-        #         #Checks if the Isbn entry input is already in the database.txt
-        #         if self.editBookEntries[0].get() == book[0]:
-        #             found = True
-
-        #         if found: break#Prematurely terminates the for-loop to make the process kind of faster
-
-        #         #Checks if the Isbn entry input is empty and prints an error
-        #The above code is not useful in this method.It can be used in the EditPopUp/AddPopUp to check if a given title is already in the library
         masterAdd = tk.Toplevel(self.root)
         newWindow = AddBookPopApp(masterAdd)
         masterAdd.mainloop()
-        
-            
-
         
     def search(self):
         '''Search button function'''
@@ -198,3 +241,9 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = App(root)
     root.mainloop()
+
+
+
+
+
+        
