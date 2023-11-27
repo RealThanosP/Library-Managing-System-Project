@@ -3,13 +3,15 @@ from tkinter import messagebox
 from tkinter import ttk
 
 class EditBookPopApp:
-    editBookEntries = []
+    
     add_placeholder = ("Isbn:", "Title:", "Author:", "Section:", "Stock:")
-
+    
     def __init__(self, root):
+        self.editBookEntries = []
         self.root = root
         self.root.title("Edit Book Info")
         self.root.geometry("270x300")
+        self.root.attributes('-topmost', 'true')
 
         #Main frame:
         self.frame = tk.Frame(self.root)
@@ -50,52 +52,75 @@ class EditBookPopApp:
     #Error-Label
         self.errorLabel = tk.Label(self.frame, text="")
         self.errorLabel.grid(row=7, column=0, columnspan=2)
-    def editBook(self):
 
-        def updateEntries():
-            #Deletes whatever you wrote
-            for i in range(0, len(self.editBookEntries)-1):
-                self.editBookEntries[i].delete(0, "end")
-
-            #Prints the info from database on the entries
-            for entryIndex, attribute in enumerate(book):
-                self.editBookEntries[entryIndex].insert(0, attribute)
-
+    def findBook(self):
+        '''Main search function. Returns tuple: (isFound, string of the book found)'''
         #Gets the inputs form the entries
         isbn = self.editBookEntries[0].get()
         title = self.editBookEntries[1].get()
         author = self.editBookEntries[2].get()
         section = self.editBookEntries[3].get()
         stock = self.editBookEntries[4].get()
-
+        #Opens the file to search for matching isbn or (title and author)
         with open("database.txt", "r", encoding="utf-8") as database:
             found = False
+            book = ""
             for book in database:
-                book = book.strip().split("\t")
+                book = book.strip("\n").split("\t")
                 #Checks if the Isbn entry input is already in the database.txt
-                if isbn == book[0] or (title == book[1] and author == book[2]):
-                    found = True
-                    print(book)
-                if found: break
+                try:
+                    if isbn == book[0] or (title == book[1] and author == book[2]):
+                        found = True
+                    if found: break
+                except IndexError: 
+                    self.errorLabel.config(text="There is no book in the database")
+        return found, book
 
-        if found: 
-            updateEntries()
+    def editBook(self):
+
+        def updateEntries(book):
+            #Deletes whatever you wrote
+            for i, v in enumerate(self.editBookEntries):
+                self.editBookEntries[i].delete(0, "end")
+
+            #Prints the info from database on the entries
+            for entryIndex, attribute in enumerate(book):
+                self.editBookEntries[entryIndex].insert(0, attribute)
+
+        #If the book is found then it just updates the Entries to the current book data
+        if self.findBook()[0]:
+            bookInfoList = self.findBook()[1]
+            updateEntries(bookInfoList)
         else:
+            for i in range(len(self.editBookEntries) - 1): self.editBookEntries[i].delete(0, "end")
             self.errorLabel.config(text="This book isn't in the library's database")
-        
 
-
+    
     def submitChanges(self):
-        return
+        book = ""
+        for index, content in enumerate(self.editBookEntries):
+            book += f"{self.editBookEntries[index].get()}\t"
+        
+        print(book)
+        with open("database.txt", "r", encoding="utf-8") as fileR:
+            lines = fileR.readlines()
+
+        with open("database.txt", "w", encoding="utf-8") as fileW:
+            for line in lines:
+                if line != book:
+                    fileW.write(book)
+                else:
+                    fileW.write(line)
 
 class AddBookPopApp:
-    addBookEntries = []
     add_placeholder = ("Isbn:", "Title:", "Author:", "Section:", "Stock:")
 
     def __init__(self, root):
+        self.addBookEntries = []
         self.root = root
         self.root.title("Add Book")
         self.root.geometry("270x300")
+        self.root.attributes('-topmost', 'true')
 
     #Main frame:
         self.frame = tk.Frame(root)
@@ -109,7 +134,7 @@ class AddBookPopApp:
         self.topLabel.grid(row=0, column=0, columnspan=2)
 
     #Entries for the book data inputs
-        for i in range(5): ##NOTE CHANGE THIS TO FIT THE SECTION ATTRIBUTE OF THE BOOKS 
+        for i in range(5):
         #Creates 5 input fielsds to fill:
             self.addBookField = tk.Entry(self.frame, borderwidth=5, width=25)
             self.addBookField.grid(row=i+1, column=1, sticky="w")
@@ -131,9 +156,6 @@ class AddBookPopApp:
         self.errorLabel = tk.Label(self.frame, text="")
         self.errorLabel.grid(row=7, column=0, columnspan=3)
     
-
-        self.closeButton = tk.Button(self.frame, text="Close", command=self.close)
-        self.closeButton.grid(row=7, column=1, columnspan=2)
     
     #Function for the SUMBIT button
     def addBook(self):
@@ -155,22 +177,19 @@ class AddBookPopApp:
         #Just makes sure isbn and the remaining items are integers:
         except ValueError:
             self.errorLabel.config(text="The data you entered are invalid\n Try again: ")
-        
-        #Takes the inputs to a list and then passes them into database.txt:
-        #Passes the data to the databases part:
-            #List of attributes of the book
+            
         try:
+            #List of attributes of the book
             atributes = [str(isbn), title, author, str(section),str(stock)]
-            book = "\t".join(atributes) + "\n"
+            book = "\n" + "\t".join(atributes)
+            #Takes the inputs to a list and then passes them into database.txt:
+            #Passes the data to the databases part:
             database = open("database.txt", "a", encoding="utf-8")
             database.write(book)
             database.close()
             messagebox.showinfo(title="A Message", message="Book Added ✔")
         except UnboundLocalError:
             self.errorLabel.config(text="Fill all the required fields")
-    
-    def close(self):
-        self.root.destroy()
         
 class App:
     editBookEntries = []
