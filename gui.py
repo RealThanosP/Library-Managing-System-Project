@@ -94,7 +94,7 @@ class EditBookPopApp:
         else:
             for i in range(len(self.editBookEntries) - 1): self.editBookEntries[i].delete(0, "end")
             self.errorLabel.config(text="This book isn't in the library's database")
-
+  
     
     def submitChanges(self):
         book = ""
