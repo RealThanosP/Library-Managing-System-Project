@@ -8,7 +8,7 @@ class App:
 
     def __init__(self, root):
         self.root = root
-        self.root.title("Library Management System")
+        self.root.title("Library Management System") 
         self.root.geometry("800x700+900+100")
         #Defines the main-frame and packs it into the screen:
         self.frame = tk.Frame(self.root, bg="black")
