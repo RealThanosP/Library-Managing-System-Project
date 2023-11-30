@@ -1,15 +1,16 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
+from tkinter import LabelFrame
     
 class App:
-    loanBookEntries = []
     BookAttributes = ("Isbn:", "Title:", "Author:", "Section:", "Stock:")
 
     def __init__(self, root):
         self.root = root
         self.root.title("Library Management System") 
-        self.root.geometry("800x700+900+100")
+        self.root.geometry("900x500+900+100")
+        self.root.wm_minsize(900, 500)
         #Defines the main-frame and packs it into the screen:
         self.frame = tk.Frame(self.root, bg="black")
         self.frame.pack(fill="both", expand=True)
@@ -17,23 +18,27 @@ class App:
     
         #Places the frame of the add book section on the screen
         self.addSection(self.frame)
-        self.frameAdd.place(x=20, y=150, anchor="w")
+        self.frameAdd.place(x=20, rely=0.05)
 
         #Places the frame of the edit book section on the screen
         self.EditSection(self.frame)
-        self.frameEdit.place(x=250, y=150, anchor="w")
+        self.frameEdit.place(x=250, rely=0.05)
         
+        #Place the frame of the loan a book section on the screen
+        self.LoanSection(self.frame)
+        self.frameLoan.place(x=530, rely=0.05)#69 NICE!!!
 
         #Kill Button (For developing reasons only)
         self.frameKill = tk.Frame(self.frame, bg="red")
         self.killButton = tk.Button(self.frameKill, text="KILL", font=("Helvetica", 20), width=10, height=3, command=self.kill)
-        self.killButton.pack()
+        
     
 
 
     def kill(self):
         self.root.destroy()
-     
+    
+    #Add Book Frame
     def addSection(self, frame):
         #Main frame:
         self.addBookEntries = []
@@ -42,7 +47,7 @@ class App:
 
         #Title Label 
         self.topLabel = tk.Label(self.frameAdd, 
-                                text="Add Book", 
+                                text="Add a Book", 
                                 justify="center",
                                 font=("Helvetica",20))
         self.topLabel.grid(row=0, column=0, columnspan=2)
@@ -55,7 +60,7 @@ class App:
         #Adds all the entries to a list to be used later to extract the data:
             self.addBookEntries.append(self.addBookField)
         #Create the pointing labels to the entries:
-            self.addBookLabel = tk.Label(self.frameAdd, text=self.BookAttributes[i], justify="right")
+            self.addBookLabel = tk.Label(self.frameAdd, text=self.BookAttributes[i], justify="center")
             self.addBookLabel.grid(row=i+1, column=0, sticky="we")
 
         #Add Button
@@ -64,7 +69,7 @@ class App:
                                     pady=15, padx=15,
                                     font=("Helvetica", 18),
                                     command=self.addBook)
-        self.addButton.grid(row=6,column=1, columnspan=2)
+        self.addButton.grid(row=6,column=1, columnspan=2, sticky="w")
 
         #Error Label at the bottom 
         self.errorLabelAdd = tk.Label(self.frameAdd, text="")
@@ -104,6 +109,7 @@ class App:
         except UnboundLocalError:
             self.errorLabelAdd.config(text="Fill all the required fields")
 
+    #Edit Book Frame
     def EditSection(self, frame):
         self.editBookEntries = []
 
@@ -112,7 +118,7 @@ class App:
 
         #Title Label
         self.titleLabel = tk.Label(self.frameEdit, 
-                                text="Edit Book", 
+                                text="Edit a Book", 
                                 justify="center",
                                 font=("Helvetica",20))
         self.titleLabel.grid(row=0, column=0, columnspan=2)
@@ -125,7 +131,7 @@ class App:
         #Adds all the entries to a list to be used later to extract the data:
             self.editBookEntries.append(self.editBookField)
         #Create the pointing labels to the entries:
-            self.editBookLabel = tk.Label(self.frameEdit, text=self.BookAttributes[i], justify="right")
+            self.editBookLabel = tk.Label(self.frameEdit, text=self.BookAttributes[i], justify="center")
             self.editBookLabel.grid(row=i+1, column=0, sticky="we")
 
         #Find Button
@@ -133,11 +139,11 @@ class App:
                                     pady=15, padx=15,
                                     font=("Helvetica", 18),
                                     command=self.editBook)
-        self.findButton.grid(row=6,column=0)
+        self.findButton.grid(row=6,column=0, sticky="e")
 
         #Submit Button
-        self.submitButton = tk.Button(self.frameEdit, text="Submit", 
-                                    pady=15, padx=15,
+        self.submitButton = tk.Button(self.frameEdit, text="Submit\nChanges", 
+                                    pady=1, padx=15,
                                     font=("Helvetica", 18),
                                     command=self.submitChanges)
         self.submitButton.grid(row=6,column=1)
@@ -150,8 +156,8 @@ class App:
 
         def updateEntries(book):
             #Deletes whatever you wrote
-            for i, v in enumerate(self.editBookEntries):
-                self.editBookEntries[i].delete(0, "end")
+            for i, entry in enumerate(self.editBookEntries):
+                entry.delete(0, "end")
 
             #Prints the info from database on the entries
             for entryIndex, attribute in enumerate(book):
@@ -161,8 +167,9 @@ class App:
         if self.findBook()[0]:
             bookInfoList = self.findBook()[1]
             updateEntries(bookInfoList)
-        else:
-            for i in range(len(self.editBookEntries) - 1): self.editBookEntries[i].delete(0, "end")
+        else:#If not found just deltes the info
+            for i, entry in enumerate(self.editBookEntries): 
+                entry.delete(0, "end")
             self.errorLabelEdit.config(text="This book isn't in the library's database")
   
     def submitChanges(self):
@@ -191,6 +198,48 @@ class App:
                     self.errorLabel.config(text="There is no book in the database")
         return found, book
 
+    #Loan Book Frame
+    def LoanSection(self, frame):
+        self.loanBookEntries = []
+        #Defines the main frame
+        self.frameLoan = tk.Frame(frame)
+        
+        #Title Label
+        self.loanLabel = tk.Label(self.frameLoan, 
+                                text="Loan a Book", 
+                                justify="center",
+                                font=("Helvetica",20))
+        self.loanLabel.grid(row=0, column=0, columnspan=2)
+
+        #Loan Book Entries for searching the book in the database based on [isbn OR (title AND author)]
+        for i in range(3):
+            #Entries
+            self.loanEntry = tk.Entry(self.frameLoan, borderwidth=5, width=25)
+            self.loanEntry.grid(row=i+1, column=1)
+            #Entry list to manage their info seperately
+            self.loanBookEntries.append(self.loanEntry)
+
+            #The labels for the entries
+            self.entryLabel = tk.Label(self.frameLoan, text=self.BookAttributes[i]) 
+            self.entryLabel.grid(row=i+1, column=0)
+
+        #The find Button
+        self.loanFindButton = tk.Button(self.frameLoan, text="Find", 
+                                        pady=15, padx=15,
+                                        font=("Helvetica", 18),
+                                        command=lambda: print(self.findBook))########### CHANGE THE FUNCTIOND
+        self.loanFindButton.grid(row=4, column=0, pady=27, sticky="e")
+
+        #The Submit Button
+        self.loanSubmitButton = tk.Button(self.frameLoan, text="Submit\nLoan", 
+                                    pady=1, padx=15,
+                                    font=("Helvetica", 18),
+                                    command=lambda: print(self.findbook))############# CHANGE THE FUNCTIONS
+        self.loanSubmitButton.grid(row=4, column=1, pady=27)
+
+        #Error Label
+        self.errorLabelLoan = tk.Label(self.frameLoan, text="")
+        self.errorLabelLoan.grid(row=5, column=0, columnspan=2)
 
 if __name__ == "__main__":
     root = tk.Tk()
