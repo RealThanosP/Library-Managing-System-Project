@@ -1,9 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
-from tkinter import LabelFrame
 from PIL import ImageTk, Image
-   
 
 class App:
     BookAttributes = ("Isbn:", "Title:", "Author:", "Section:", "Stock:")
@@ -19,9 +17,12 @@ class App:
         self.frame.pack(fill="both", expand=True)
         
         #Background Image
-        self.backgroundImg = ImageTk.PhotoImage(Image.open("background.png"))
-        self.backLabel = tk.Label(self.frame, image=self.backgroundImg)
-    
+        self.backgroundImg = Image.open("background.png")
+        self.backLabel = ImageTk.PhotoImage(self.backgroundImg)
+        
+        self.backLabel = tk.Label(self.frame, image=self.backLabel)
+        self.backLabel.pack()
+
         #Places the frame of the add book section on the screen
         self.addSection(self.frame)
         self.frameAdd.place(x=20, rely=0.05)
