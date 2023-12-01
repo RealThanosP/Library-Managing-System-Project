@@ -2,7 +2,9 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 from tkinter import LabelFrame
-    
+from PIL import ImageTk, Image
+   
+
 class App:
     BookAttributes = ("Isbn:", "Title:", "Author:", "Section:", "Stock:")
 
@@ -11,10 +13,14 @@ class App:
         self.root.title("Library Management System") 
         self.root.geometry("900x500+900+100")
         self.root.wm_minsize(900, 500)
+
         #Defines the main-frame and packs it into the screen:
-        self.frame = tk.Frame(self.root, bg="black")
+        self.frame = tk.Frame(self.root)
         self.frame.pack(fill="both", expand=True)
         
+        #Background Image
+        self.backgroundImg = ImageTk.PhotoImage(Image.open("background.png"))
+        self.backLabel = tk.Label(self.frame, image=self.backgroundImg)
     
         #Places the frame of the add book section on the screen
         self.addSection(self.frame)
@@ -32,7 +38,7 @@ class App:
         self.frameKill = tk.Frame(self.frame, bg="red")
         self.killButton = tk.Button(self.frameKill, text="KILL", font=("Helvetica", 20), width=10, height=3, command=self.kill)
         
-    
+
 
 
     def kill(self):
@@ -227,19 +233,21 @@ class App:
         self.loanFindButton = tk.Button(self.frameLoan, text="Find", 
                                         pady=15, padx=15,
                                         font=("Helvetica", 18),
+                                        image="background.jpg",
                                         command=lambda: print(self.findBook))########### CHANGE THE FUNCTIOND
-        self.loanFindButton.grid(row=4, column=0, pady=27, sticky="e")
+        self.loanFindButton.grid(row=4, column=0, pady=(52,0), padx=(15,0),sticky="e")
 
         #The Submit Button
         self.loanSubmitButton = tk.Button(self.frameLoan, text="Submit\nLoan", 
                                     pady=1, padx=15,
                                     font=("Helvetica", 18),
+                                    bg="red",
                                     command=lambda: print(self.findbook))############# CHANGE THE FUNCTIONS
-        self.loanSubmitButton.grid(row=4, column=1, pady=27)
+        self.loanSubmitButton.grid(row=4, column=1, pady=(52,0), padx=15)
 
         #Error Label
         self.errorLabelLoan = tk.Label(self.frameLoan, text="")
-        self.errorLabelLoan.grid(row=5, column=0, columnspan=2)
+        self.errorLabelLoan.grid(row=5, column=0, columnspan=2, pady=1)
 
 if __name__ == "__main__":
     root = tk.Tk()
