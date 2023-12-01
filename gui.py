@@ -15,13 +15,6 @@ class App:
         #Defines the main-frame and packs it into the screen:
         self.frame = tk.Frame(self.root)
         self.frame.pack(fill="both", expand=True)
-        
-        #Background Image
-        self.backgroundImg = Image.open("background.png")
-        self.backLabel = ImageTk.PhotoImage(self.backgroundImg)
-        
-        self.backLabel = tk.Label(self.frame, image=self.backLabel)
-        self.backLabel.pack()
 
         #Places the frame of the add book section on the screen
         self.addSection(self.frame)
