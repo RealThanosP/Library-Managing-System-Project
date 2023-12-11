@@ -4,12 +4,12 @@ from User import User
 class SignUpPopUpApp:
     def __init__(self, root):
         self.root = root
-        self.root.geometry("300x400-1900+200")
+        self.root.geometry("300x400+1000+200")
         self.root.title("Library Management System")
         self.root.resizable(False, False)
 
         #Main Frame:
-        self.frame = tk.Frame(self.root)
+        self.frame = tk.Frame(self.root,)
         self.frame.pack(fill="both", expand= True)
 
         #Places the Sign in section to the screen
@@ -42,25 +42,26 @@ class SignUpPopUpApp:
         #Functions to handle the changes of the temporary text in the entries
         def focusIn(entry, isUser):#When entry is clicked in
             entry.delete(0, "end")
-            if isUser: entry.config(fg="white")
-            else: entry.config(fg="white", show="*")
+            if isUser: entry.config(fg="black")
+            else: entry.config(fg="black", show="*")
 
         def focusOut(entry,  isUser):#When entry is clicked out
             if entry.get():
                 return False
+                
             entry.config(fg="grey")
             if isUser: entry.insert(0, "Username: ")
             else: entry.insert(0, "Password: ")
 
         #Username entry:
-        self.usernameEntry = tk.Entry(self.frameEntries, borderwidth=5, fg="grey")
+        self.usernameEntry = tk.Entry(self.frameEntries, borderwidth=5, fg="grey", width=25)
         self.usernameEntry.insert(0, "Username: ")
         self.usernameEntry.bind("<FocusIn>", lambda event: focusIn(self.usernameEntry, True))
         self.usernameEntry.bind("<FocusOut>", lambda event: focusOut(self.usernameEntry, True))
         self.usernameEntry.pack()
         
         #Password Entry:
-        self.passwordEntry = tk.Entry(self.frameEntries, borderwidth=5, fg="grey")
+        self.passwordEntry = tk.Entry(self.frameEntries, borderwidth=5, fg="grey", width=25)
         self.passwordEntry.insert(0, "Password: ")
         self.passwordEntry.bind("<FocusIn>", lambda event: focusIn(self.passwordEntry, False))
         self.passwordEntry.bind("<FocusOut>", lambda event: focusOut(self.passwordEntry, False))
@@ -74,7 +75,7 @@ class SignUpPopUpApp:
 
         #Places all the frames inro the screen:
         self.frameTitle.grid(row=0, column=0, columnspan=2)
-        self.frameEntries.grid(row=1, column=0)
+        self.frameEntries.grid(row=1, column=0, columnspan=2)
         self.frameButtons.grid(row=2, column=0, columnspan=2)
 
     def signUp(self):
@@ -93,11 +94,13 @@ class SignUpPopUpApp:
         
         if name and password:
             user = User(name)
-        else:
+        elif name == "Username: " or password == "Password: ":
             self.errorLabel.config(text="Please enter a username and a password")
             return 0
+
+        try: credentials = user.sign_up(name, password)
+        except UnboundLocalError: return 0
         
-        credentials = user.sign_up(name, password)
         if credentials == "Username already taken. Please try again.":
             self.errorLabel.config(text=credentials)
         elif credentials == "Signup successful!":

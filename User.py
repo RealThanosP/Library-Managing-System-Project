@@ -19,7 +19,7 @@ class User:
                     return "Username already taken. Please try again."
 
         with open("users.txt", "a") as file:
-            file.write(f"{username},{passwordHash}\n")
+            file.write(f"\n{username},{passwordHash}")
         return "Signup successful!"
 
     def sign_in(self, library, username, password):
