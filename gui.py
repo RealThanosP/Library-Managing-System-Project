@@ -22,36 +22,37 @@ class SignInPopUpApp:
         self.frame = tk.Frame(self.root)
         self.frame.pack(fill="both", expand= True)
 
+        #Set the backround
+        self.setBackround(self.frame, "background.png", 300, 400)
+
         #Places the Sign in section to the screen
         self.signInSection(self.frame)
-        self.frameSignIn.pack()
-
-        #Error Label
-        self.errorLabel = tk.Label(self.frame)
-        self.errorLabel.pack()
+        self.frameSignIn.pack(pady=(30,0))
 
         #Frame for the bottom text
         self.signUpSection(self.frame)
         self.frameSignUp.place(relx=0.5, rely=0.9, anchor="center")
-
     #Sign in section:
     def signInSection(self, frame):
         '''Handles the visible part where you can sign in to the platform'''
         #Main frame
-        self.frameSignIn = tk.Frame(frame)
+        self.frameSignIn = tk.Frame(frame, bg="#D2B48C")
 
         #Frame for the entries
-        self.frameEntries = tk.Frame(self.frameSignIn)
+        self.frameEntries = tk.Frame(self.frameSignIn, bg="#D2B48C")
 
         #Frame for the buttons
-        self.frameButtons = tk.Frame(self.frameSignIn)
+        self.frameButtons = tk.Frame(self.frameSignIn, bg="#D2B48C")
 
         #Frame fo the title label:
-        self.frameTitle = tk.Frame(self.frameSignIn)
+        self.frameTitle = tk.Frame(self.frameSignIn, bg="#D2B48C")
 
         #Title Label:
-        self.titleLabel = tk.Label(self.frameTitle, text="Join the App!!!", font=("Helvetica", 20))
-        self.titleLabel.pack(pady=(20,60))
+        self.titleLabel = tk.Label(self.frameTitle, 
+                                    text="Join the App!!!", 
+                                    font=("Helvetica", 20),
+                                    bg="#C7A186")
+        self.titleLabel.pack(pady=(20,60), padx=25)
 
         #Functions to handle the changes of the temporary text in the entries
         def focusIn(entry, isUser):#When entry is clicked in
@@ -67,14 +68,14 @@ class SignInPopUpApp:
             else: entry.insert(0, "Password: ")
 
         #Username entry:
-        self.usernameEntry = tk.Entry(self.frameEntries, borderwidth=5, fg="grey")
+        self.usernameEntry = tk.Entry(self.frameEntries, borderwidth=5, fg="grey", width=25)
         self.usernameEntry.insert(0, "Username: ")
         self.usernameEntry.bind("<FocusIn>", lambda event: focusIn(self.usernameEntry, True))
         self.usernameEntry.bind("<FocusOut>", lambda event: focusOut(self.usernameEntry, True))
         self.usernameEntry.pack()
         
         #Password Entry:
-        self.passwordEntry = tk.Entry(self.frameEntries, borderwidth=5, fg="grey")
+        self.passwordEntry = tk.Entry(self.frameEntries, borderwidth=5, fg="grey", width=25)
         self.passwordEntry.insert(0, "Password: ")
         self.passwordEntry.bind("<FocusIn>", lambda event: focusIn(self.passwordEntry, False))
         self.passwordEntry.bind("<FocusOut>", lambda event: focusOut(self.passwordEntry, False))
@@ -85,11 +86,15 @@ class SignInPopUpApp:
         self.signInButton = tk.Button(self.frameButtons, text="Sign In", font=("Helvetica", 20), command=self.signIn)
         self.signInButton.pack(pady=(30,0))
 
+        #Error Label
+        self.errorLabel = tk.Label(self.frameSignIn, bg="#D2B48C")
+
         #Places all the frames inro the screen:
         self.frameTitle.grid(row=0, column=0, columnspan=2)
         self.frameEntries.grid(row=1, column=0, columnspan=2)
         self.frameButtons.grid(row=2, column=0, columnspan=2)
-
+        self.errorLabel.grid(row=3, column=0, columnspan=2)
+        
     def signIn(self):
         def updateEntries():
             #Gets the input:
@@ -110,8 +115,7 @@ class SignInPopUpApp:
             self.root.destroy()
             self.name = name
             self.openAppWindow()
-            self.errorLabel.config(text=f"Welcome back, {name}")
-
+            
     def signUpSection(self, frame):
         #Main Frame:
         self.frameSignUp = tk.Frame(frame)
@@ -123,6 +127,16 @@ class SignInPopUpApp:
         #Button:
         self.signUpButton = tk.Button(self.frameSignUp, text="Sign Up", command= self.openSignUpWindow)
         self.signUpButton.pack(side="right")
+    
+    def setBackround(self, frame, image, width, height):
+        #Sets up the backroound
+        image = Image.open(image)
+        img_w, img_h = image.size
+        image = image.resize((width, height))
+        self.bg = ImageTk.PhotoImage(image)
+        self.backround = tk.Canvas(frame, border=0, highlightthickness=0, relief="ridge")
+        self.backround.create_image(0, 0, image=self.bg, anchor="nw")
+        self.backround.place(x=0, y=0, relwidth=1, relheight=1)
 
     def openAppWindow(self):
         master = tk.Tk()
@@ -155,7 +169,7 @@ class App:
         self.setBackround(self.frame, "background.png", 600, 500)
 
         #Button to sign out
-        self.signoutButton = tk.Button(self.frame, text="↩Sign out", font=("Helvetica", 15), command=self.openSignInWindow)
+        self.signoutButton = tk.Button(self.frame, text="↩Sign out", font=("Helvetica", 15), bg="#CFCFDF",command=self.openSignInWindow)
         self.signoutButton.place(relx=0.01, rely=0.05, anchor="w")
 
         #Places the User data on the top of the screen
@@ -181,7 +195,12 @@ class App:
 
         #Decides weather to place a book to access the database
         if self.name in self.adminNames:
-            self.changeLibraryButton = tk.Button(self.frame, text="Make Changes", font=("Helvetica",15),padx=15, pady=15, command=self.openAdminWindow)
+            self.changeLibraryButton = tk.Button(self.frame, 
+                                            text="Make Changes", 
+                                            font=("Helvetica",15), 
+                                            bg="#CFCFDF",
+                                            padx=15, pady=15, 
+                                            command=self.openAdminWindow)
             self.changeLibraryButton.place(relx=0.5, rely=0.9, anchor="s")
 
     def setBackround(self, frame, image, width, height):
@@ -198,33 +217,33 @@ class App:
     def LoanSection(self, frame):
         self.loanBookEntries = []
         #Defines the main frame
-        self.frameLoan = tk.Frame(frame)
+        self.frameLoan = tk.Frame(frame, bg="#D2B48C")
 
         #Frame for the title:
-        self.frameLoanTitle = tk.Frame(self.frameLoan)
+        self.frameLoanTitle = tk.Frame(self.frameLoan, bg="#D2B48C")
 
         #Frame for the entries:
-        self.frameLoanEntries = tk.Frame(self.frameLoan)
+        self.frameLoanEntries = tk.Frame(self.frameLoan, bg="#D2B48C")
 
         #Frame for the labels:
-        self.frameLoanLabels = tk.Frame(self.frameLoan)
+        self.frameLoanLabels = tk.Frame(self.frameLoan, bg="#D2B48C")
 
         #Frame for the buttons
-        self.frameLoanButtons = tk.Frame(self.frameLoan)
+        self.frameLoanButtons = tk.Frame(self.frameLoan, bg="#D2B48C")
 
         #Frame for the error label
-        self.frameLoanErrors = tk.Frame(self.frameLoan)
+        self.frameLoanErrors = tk.Frame(self.frameLoan, bg="#D2B48C")
         
         #Title Label
         self.loanLabel = tk.Label(self.frameLoanTitle, 
                                 text="Loan a Book", 
                                 justify="center",
                                 font=("Helvetica",20),
-                                pady=10)
+                                pady=10, bg="#D2B48C")
         self.loanLabel.pack()
 
         #Loan Book Entries for searching the book in the database based on [isbn OR (title AND author)]
-        for i in range(3):
+        for i in range(2):
             #Entries
             self.loanEntry = tk.Entry(self.frameLoanEntries, borderwidth=5, width=25)
             self.loanEntry.pack(pady=4)
@@ -233,65 +252,62 @@ class App:
             self.loanBookEntries.append(self.loanEntry)
 
             #The labels for the entries
-            self.entryLabel = tk.Label(self.frameLoanLabels, text=self.BookAttributes[i], justify="center") 
+            self.entryLabel = tk.Label(self.frameLoanLabels, text=self.BookAttributes[i+1], justify="center", bg="#D2B48C") 
             self.entryLabel.pack(pady=8)
 
-        #The find Button
-        self.loanFindButton = tk.Button(self.frameLoanButtons, text="Find", 
-                                        pady=16, padx=12,
-                                        bg="#CFCFCF",
-                                        font=("Helvetica", 20),
-                                        command=lambda: print(self.findBook))########### CHANGE THE FUNCTION
-        self.loanFindButton.pack(side="left", padx=(10,5))
-
         #The Submit Button
-        self.loanSubmitButton = tk.Button(self.frameLoanButtons, text="Submit\nLoan", 
-                                    pady=0, padx=15,
-                                    bg="#CFCFCF",
+        self.loanSubmitButton = tk.Button(self.frameLoanButtons, text="Loan", 
+                                    pady=15, padx=20,
+                                    bg="#CFCFDF",
                                     font=("Helvetica", 20),
-                                    command=lambda: print(self.findbook))############# CHANGE THE FUNCTIONS
+                                    command=self.submitChanges)############# CHANGE THE FUNCTIONS
         self.loanSubmitButton.pack(side="right", padx=(5,10))
 
         #Error Label
-        self.errorLabelLoan = tk.Label(self.frameLoanErrors, text="Error Label")
+        self.errorLabelLoan = tk.Label(self.frameLoanErrors, text="Error Label", bg="#D2B48C")
         self.errorLabelLoan.grid(row=5, column=0, columnspan=2, pady=1)
 
         #Places all the frames into the screen
         self.frameLoanTitle.grid(row=0,column=0,columnspan=2)
-        self.frameLoanLabels.grid(row=1, column=0)
-        self.frameLoanEntries.grid(row=1,column=1)
-        self.frameLoanButtons.grid(row=2,column=0,columnspan=2)
+        self.frameLoanLabels.grid(row=1, column=0,padx=10)
+        self.frameLoanEntries.grid(row=1,column=1,padx=10)
+        self.frameLoanButtons.grid(row=2,column=0,columnspan=2, pady=10)
         self.frameLoanErrors.grid(row=3,column=0,columnspan=2)
     
+    def loanBook(self):
+        '''Allows the find button to find the book ot be loaned out'''
+
+    def submitChanges(self):
+        '''Submit the changes'''
     #Return Book Frame
     def ReturnSection(self, frame):
         #Main Frame
         self.returnBookEntries = []
-        self.frameReturn = tk.Frame(frame)
+        self.frameReturn = tk.Frame(frame, bg="#D2B48C")
         
         #Title frame
-        self.frameReturnTitle = tk.Frame(self.frameReturn)
+        self.frameReturnTitle = tk.Frame(self.frameReturn, bg="#D2B48C")
 
         #Entries frame
-        self.frameReturnEntries = tk.Frame(self.frameReturn)
+        self.frameReturnEntries = tk.Frame(self.frameReturn, bg="#D2B48C")
 
         #Label Frame
-        self.frameReturnLabels = tk.Frame(self.frameReturn)
+        self.frameReturnLabels = tk.Frame(self.frameReturn, bg="#D2B48C")
 
         #Buttons frame
-        self.frameReturnButton = tk.Frame(self.frameReturn)
+        self.frameReturnButton = tk.Frame(self.frameReturn, bg="#D2B48C")
 
         #Title Label
         self.returnTitle = tk.Label(self.frameReturnTitle, 
                                     text="Return your Book", 
                                     font=("Helvetica", 20),
-                                    pady=10) 
+                                    pady=10, bg="#D2B48C") 
         self.returnTitle.pack()
 
         #Title and author inputs
         for i in range(2):
             #Labels
-            self.returnBookLabel = tk.Label(self.frameReturnLabels, text=self.BookAttributes[i+1]) 
+            self.returnBookLabel = tk.Label(self.frameReturnLabels, text=self.BookAttributes[i+1], bg="#D2B48C") 
             self.returnBookLabel.pack(pady=8)
 
             #Entries
@@ -306,44 +322,18 @@ class App:
                                         text="Return", 
                                         pady=15, padx=15,
                                         font=("Helvetica", 20), 
-                                        bg="#CFCFCF")
+                                        bg="#CFCFDF")
         self.returnButton.pack()
 
         #Error Label
-        self.errorLabelReturn = tk.Label(self.frameReturn, text="ERROR")
+        self.errorLabelReturn = tk.Label(self.frameReturn, text="ERROR", bg="#D2B48C")
 
         #Places everything on the main frame
         self.frameReturnTitle.grid(row=0, column=0, columnspan=2)
         self.frameReturnLabels.grid(row=1, column=0, padx=10)
         self.frameReturnEntries.grid(row=1, column=1, padx=10)
-        self.frameReturnButton.grid(row=2, column=0, columnspan=2)
+        self.frameReturnButton.grid(row=2, column=0, columnspan=2, pady=10)
         self.errorLabelReturn.grid(row=3, column=0, columnspan=2)
-
-    def findBook(self):
-        '''Main search function. Returns tuple: (isFound, string of the book found)'''
-        #Gets the inputs form the entries
-        isbn = self.editBookEntries[0].get()
-        title = self.editBookEntries[1].get()
-        author = self.editBookEntries[2].get()
-        section = self.editBookEntries[3].get()
-        stock = self.editBookEntries[4].get()
-        error = ""#Controls the text shown to the user based on if book is found
-        #Opens the file to search for matching isbn or (title and author)
-        with open("database.txt", "r", encoding="utf-8") as database:
-            found = False
-            book = ""
-            for book in database:
-                book = book.strip("\n").split("\t")
-                #Checks if the Isbn entry input is already in the database.txt
-                try:
-                    if isbn == book[0] or (title == book[1] and author == book[2]):
-                        found = True
-                    if found: 
-                        error = "Book Found"
-                        break
-                except IndexError: 
-                    error = "This book is not in our library's database"
-        return found, book, error
 
     def openAdminWindow(self):
         master = tk.Toplevel()
@@ -358,5 +348,5 @@ class App:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = SignInPopUpApp(root)
+    app = App(root, "admin")
     root.mainloop()
