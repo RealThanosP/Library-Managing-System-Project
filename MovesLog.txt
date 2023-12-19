@@ -1,0 +1,3 @@
+Book 'Bible' by 'God' loaned out successfully by 'admin'
+Book 'Bible' by 'God' loaned out successfully by 'user'
+Book 'Harry Potter' by 'JK Rowling' loaned out successfully by 'user'

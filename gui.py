@@ -5,6 +5,7 @@ from PIL import Image , ImageTk
 from AdminWindow import AdminPopUp
 from User import User
 from SignUp import SignUpPopUpApp
+from database import Book, Database
 
 class SignInPopUpApp:
         
@@ -193,7 +194,23 @@ class App:
         self.ReturnSection(self.frame)
         self.frameReturn.place(relx=0.75, rely=0.15, anchor="n")
 
-        #Decides weather to place a book to access the database
+        #Button that lets you access your books
+        self.yourBookButton = tk.Button(self.frame, 
+                            text="Your Books", 
+                            font=("Helvetica, 15"),
+                            bg="#CFCFDF",
+                            padx=15,pady=15,)
+                            #,command=self.openBookList)
+        self.yourBookButton.place(relx=0.2, rely=0.9, anchor="s")
+
+        #Button that lets you browse the library and loan books easier
+        self.browseBooksButton = tk.Button(self.frame, 
+                            text="Browse...", 
+                            font=("Helvetica, 15"),
+                            bg="#CFCFDF",
+                            padx=15,pady=15,)
+        self.browseBooksButton.place(relx=0.8, rely=0.9, anchor="s")
+        #Decides weather to place a button to access the database
         if self.name in self.adminNames:
             self.changeLibraryButton = tk.Button(self.frame, 
                                             text="Make Changes", 
@@ -260,7 +277,7 @@ class App:
                                     pady=15, padx=20,
                                     bg="#CFCFDF",
                                     font=("Helvetica", 20),
-                                    command=self.submitChanges)############# CHANGE THE FUNCTIONS
+                                    command=self.loanBook)############# CHANGE THE FUNCTIONS
         self.loanSubmitButton.pack(side="right", padx=(5,10))
 
         #Error Label
@@ -276,9 +293,40 @@ class App:
     
     def loanBook(self):
         '''Allows the find button to find the book ot be loaned out'''
+        title = self.loanBookEntries[0].get().strip(" ")
+        author = self.loanBookEntries[1].get().strip(" ")
+        #Initialize the database
+        library = Database("Library.db")
+        
+        #Search for the book:
+        found_book = library.get_book(0, title, author)#tuple
+        if found_book == None:
+            self.errorLabelLoan.config(text="The book you ask for is not in our database")  
+            return
+        #Set the book
+        book = Book(*found_book)
 
-    def submitChanges(self):
-        '''Submit the changes'''
+        #Initialize the user that enters 
+        user = User(self.name)
+        loan_book = user.loan_out(book)
+
+        if loan_book == None:
+            self.errorLabelLoan.config(text="You already have the book loaned out")
+            return
+
+        if book.stock > 0:
+            book.stock -= 1
+            library.updateInfo(book.isbn, book.title, book.author, book.section, book.stock)
+            self.errorLabelLoan.config(text=f"You loaned out {book.title} by {book.author}.\nEnjoy it")
+        else:
+            self.errorLabelLoan.config(text=loan_book)#f"We are sorry but {book.title} by {book.author}\n is out of stock")
+        
+
+    def openBookList(self):
+        root = tk.Toplevel()
+        app = BookListApp(root, self.name)
+        root.mainloop
+
     #Return Book Frame
     def ReturnSection(self, frame):
         #Main Frame
@@ -348,5 +396,5 @@ class App:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = App(root, "admin")
+    app = App(root, "user")
     root.mainloop()

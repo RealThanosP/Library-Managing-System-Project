@@ -5,12 +5,12 @@ def create_table():
     c = conn.cursor()
     c.execute("""CREATE TABLE IF NOT EXISTS books(
     isbn integer ,
-    book_name text,
+    title text,
     author text,
     section integer,
     stock integer,
     UNIQUE (isbn)
-    UNIQUE (book_name, author)
+    UNIQUE (title, author)
     )""")
     conn.commit()
     conn.close()
@@ -23,12 +23,15 @@ def drop_table():
         
 
 class Book:
-    def __init__(self,isbn,book_name,author,section,stock):
+    def __init__(self,isbn,title,author,section,stock):
         self.isbn = int(isbn)
-        self.book_name = str(book_name)
+        self.title = str(title)
         self.author = str(author)
         self.section = int(section)
         self.stock = int(stock)
+    
+        
+
 
 class Database:
     '''Handles all the functionalities of the database of books of the app'''
@@ -40,7 +43,7 @@ class Database:
         self.c = self.conn.cursor()
         self.c.execute("""CREATE TABLE IF NOT EXISTS books(
         isbn integer ,
-        book_name text,
+        title text,
         author text,
         section integer,
         stock integer,
@@ -48,8 +51,8 @@ class Database:
         )""")
         self.conn.commit()
     
-    def add_book_database(self, isbn, book_name, author, section, stock):
-        add = Book(isbn,book_name,author,section,stock) 
+    def add_book_database(self, isbn, title, author, section, stock):
+        add = Book(isbn,title,author,section,stock) 
         value_to_check = add.isbn
         check_value_sql = '''
         SELECT EXISTS (
@@ -64,7 +67,7 @@ class Database:
         if self.c.fetchone()[0]:
             return "This book is already in the database.\n You can edit it's details on the edit window."
         try:
-            self.c.execute("INSERT INTO books  VALUES (?, ?, ?, ?, ?)",(add.isbn,add.book_name,add.author,add.section,add.stock))
+            self.c.execute("INSERT INTO books  VALUES (?, ?, ?, ?, ?)",(add.isbn,add.title,add.author,add.section,add.stock))
             self.conn.commit()
             return 'Book successfully added!'
         except Exception as error:
@@ -76,8 +79,6 @@ class Database:
         self.conn.commit()
         return f'Book with isbn:{isbn} deleted'
         
-        
-        
     def show_database(self):
         order = input('Select order by:\n1)isbn\n2)book-name\n3)author\n4)section\n5)stock\n...')
         if order == '1':
@@ -85,7 +86,7 @@ class Database:
             self.c.execute("SELECT rowid, * FROM books ORDER BY isbn")
             pass
         if order == '2':
-            self.c.execute("SELECT rowid, * FROM books ORDER BY book_name")
+            self.c.execute("SELECT rowid, * FROM books ORDER BY title")
             pass
         if order == '3':
             self.c.execute("SELECT rowid, * FROM books ORDER BY author")
@@ -102,7 +103,7 @@ class Database:
             print(item)
         self.conn.commit()
 
-    def get_book(self, isbn, book_name, author):
+    def get_book(self, isbn, title, author):
         #show something accurate
         book_found = False
         try:
@@ -111,8 +112,8 @@ class Database:
                 book_found = self.c.fetchall()
                 
             if not book_found:
-                if book_name and author:
-                    self.c.execute("SELECT * FROM books WHERE book_name == (?) AND author == ?",(book_name, author,))
+                if title and author:
+                    self.c.execute("SELECT * FROM books WHERE title == (?) AND author == ?",(title, author,))
                     book_found = self.c.fetchall() 
             self.conn.commit()
 
@@ -124,17 +125,17 @@ class Database:
             return None
     
     def checkForDublicates(self):
-        self.c.execute("SELECT book_name,author FROM books GROUP BY book_name, author HAVING COUNT(*) > 1")
+        self.c.execute("SELECT title,author FROM books GROUP BY title, author HAVING COUNT(*) > 1")
         dublicates = self.c.fetchall()
         self.conn.commit()
 
-        #Checks if for the duplicate combinations of book_name and author found
+        #Checks if for the duplicate combinations of title and author found
         if dublicates: 
             return True
         return False
 
-    def updateInfo(self, isbn, book_name, author, section, stock):
-        edit = self.get_book(isbn, book_name, author)
+    def updateInfo(self, isbn, title, author, section, stock):
+        edit = self.get_book(isbn, title, author)
         if edit == None:
             return "That book is not in our database.\nYou can add it on the add window"
 
@@ -144,7 +145,7 @@ class Database:
 
         try:
             self.c.execute("UPDATE books SET isbn = (?) WHERE ROWID = (?)",(isbn, rowid,))
-            self.c.execute("UPDATE books SET book_name = (?) WHERE ROWID = (?)",(book_name, rowid,))
+            self.c.execute("UPDATE books SET title = (?) WHERE ROWID = (?)",(title, rowid,))
             self.c.execute("UPDATE books SET author = (?) WHERE ROWID = (?)",(author, rowid,))
             self.c.execute("UPDATE books SET section = (?) WHERE ROWID = (?)",(section, rowid,))
             self.c.execute("UPDATE books SET stock = (?) WHERE ROWID = (?)",(stock, rowid,))
@@ -154,8 +155,8 @@ class Database:
         except Exception as error:
             return "This edit is not valid\nDublicates are being created"
 
-    def updateStock(self, book_name, author, new_stock):
-        change = self.get_book(0, book_name, author)
+    def updateStock(self, title, author, new_stock):
+        change = self.get_book(0, title, author)
         if change == None:
             return "That book is not in our database.\nYou can add it on the add window"
 
@@ -169,8 +170,3 @@ class Database:
             return "The stock has benn updated"
         except Exception as error:
             return "Something went wrong, please try again"
-
-
-if __name__ == '__main__':
-    library = Database("Library.db")
-    print(library.updateInfo(1234, "Bible", "God", 101, 1))

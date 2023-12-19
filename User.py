@@ -1,8 +1,17 @@
+import os 
+
+class Book:
+    def __init__(self,isbn,title,author,section,stock):
+        self.isbn = int(isbn)
+        self.title = str(title)
+        self.author = str(author)
+        self.section = int(section)
+        self.stock = int(stock)
+
 class User:
+    loans = []
     def __init__(self, username):
         self.username = username
-        self.loans = []  # Each element is a dictionary {'book': book_info, 'loaned_by': username}
-        self.library = []  # Each user has their own library
 
     def myHash(self, text:str):
         hash=0
@@ -35,17 +44,32 @@ class User:
         print("Wrong username or password. Please try again.")
         return None
 
-    def loan_out(self, title, author):
-        for book in self.library:
-            if book['title'] == title and book['author'] == author and book['stock'] > 0:
-                book['stock'] -= 1
-                loan_info = {'book': book, 'loaned_by': self.username}
-                self.loans.append(loan_info)
-                print(f"Book '{title}' by {author} loaned successfully by {self.username}")
-                return True
-        print(f"Book '{title}' by {author} not available for loan.")
-        return False
+    def loan_out(self, book:Book):
+        #Checks for the book in the users file of loans
+        def create_file_if_not_exist(folder_path, file_name):
+            file_path = os.path.join(folder_path, file_name)
+            if not os.path.exists(file_path):
+                # Create the file if it doesn't exist
+                with open(file_path, 'w'):
+                    pass  # Empty context manager to create the file
 
+        create_file_if_not_exist("UserFiles", f"{self.username}.txt") 
+
+        with open(f"UserFiles/{self.username}.txt", "r", encoding="utf-8") as file:
+            for line in file:
+                data = line.strip().split(",")
+                if data == [str(book.isbn), book.title, book.author, str(book.section)]:
+                    return None        
+                    
+        loan_info = f"Book '{book.title}' by '{book.author}' loaned out successfully by '{self.username}'\n"
+        with open("MovesLog.txt", "a", encoding="utf-8") as file:
+            file.write(loan_info)
+        
+        with open(f"UserFiles/{self.username}.txt", "a", encoding="utf-8") as file:
+            file.write(f"{book.isbn},{book.title},{book.author},{book.section}\n")
+
+        return "Done"
+        
     def return_in(self, title, author):
         for loan_info in self.loans:
             if loan_info['book']['title'] == title and loan_info['book']['author'] == author:
@@ -67,48 +91,3 @@ class User:
             book = loan_info['book']
             print(f"Title: {book['title']}, Author: {book['author']}, Loaned by: {loan_info['loaned_by']}")
 
-if __name__ == "__main__":
-    global_library = [
-        {'title': 'Book_1', 'author': 'Author_1', 'stock': 3},
-        {'title': 'Book_2', 'author': 'Author_2', 'stock': 2},
-        {'title': 'Book_3', 'author': 'Author_3', 'stock': 1}
-    ]
-
-    user_manager = User(None)
-    logged_in = False
-
-    while True:
-        if logged_in == False:
-            print("1. Sign up")
-            print("2. Sign in")
-        if logged_in:
-            print("3. Loan a book")
-            print("4. Return a book")
-            print("5. Display user's loans")
-        print("6. Exit")
-
-        choice = input("Enter your choice (1/2/3/4/5/6): ")
-
-        if choice == '1':
-            user_manager.username = user_manager.sign_up()
-        elif choice == '2':
-            username = user_manager.sign_in(global_library)
-            if username:
-                user_manager.username = username
-                logged_in = True
-        elif logged_in:
-            if choice == '3':
-                title = input("Enter the title of the book to loan: ")
-                author = input("Enter the author of the book to loan: ")
-                user_manager.loan_out(title, author)
-            elif choice == '4':
-                title = input("Enter the title of the book to return: ")
-                author = input("Enter the author of the book to return: ")
-                user_manager.return_in(title, author)
-            elif choice == '5':
-                user_manager.display_loans()
-        elif choice == '6':
-            print("Goodbye!")
-            break
-        else:
-            print("Invalid choice. Please choose 1, 2, 3, 4, 5, or 6.")
