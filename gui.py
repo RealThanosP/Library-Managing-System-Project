@@ -6,6 +6,7 @@ from AdminWindow import AdminPopUp
 from User import User
 from SignUp import SignUpPopUpApp
 from database import Book, Database
+from SeeYourBooks import BookDisplay
 
 class SignInPopUpApp:
         
@@ -199,8 +200,8 @@ class App:
                             text="Your Books", 
                             font=("Helvetica, 15"),
                             bg="#CFCFDF",
-                            padx=15,pady=15,)
-                            #,command=self.openBookList)
+                            padx=15,pady=15,
+                            command=self.openBookList)
         self.yourBookButton.place(relx=0.2, rely=0.9, anchor="s")
 
         #Button that lets you browse the library and loan books easier
@@ -321,10 +322,9 @@ class App:
         else:
             self.errorLabelLoan.config(text=loan_book)#f"We are sorry but {book.title} by {book.author}\n is out of stock")
         
-
     def openBookList(self):
         root = tk.Toplevel()
-        app = BookListApp(root, self.name)
+        app = BookDisplay(root, self.name)
         root.mainloop
 
     #Return Book Frame
@@ -396,5 +396,5 @@ class App:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = App(root, "user")
+    app = SignInPopUpApp(root)
     root.mainloop()

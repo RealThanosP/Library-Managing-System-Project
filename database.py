@@ -21,7 +21,6 @@ def drop_table():
     c.execute("DROP TABLE books")
     conn.commit()
         
-
 class Book:
     def __init__(self,isbn,title,author,section,stock):
         self.isbn = int(isbn)
@@ -30,9 +29,6 @@ class Book:
         self.section = int(section)
         self.stock = int(stock)
     
-        
-
-
 class Database:
     '''Handles all the functionalities of the database of books of the app'''
     def __init__(self, name):
@@ -80,28 +76,11 @@ class Database:
         return f'Book with isbn:{isbn} deleted'
         
     def show_database(self):
-        order = input('Select order by:\n1)isbn\n2)book-name\n3)author\n4)section\n5)stock\n...')
-        if order == '1':
-            #how to be ordered
-            self.c.execute("SELECT rowid, * FROM books ORDER BY isbn")
-            pass
-        if order == '2':
-            self.c.execute("SELECT rowid, * FROM books ORDER BY title")
-            pass
-        if order == '3':
-            self.c.execute("SELECT rowid, * FROM books ORDER BY author")
-            pass
-        if order == '4':
-            self.c.execute("SELECT rowid, * FROM books ORDER BY section")
-            pass
-        if order == '5':
-            self.c.execute("SELECT rowid, * FROM books ORDER BY stock")
-            pass
-        
+        self.c.execute("SELECT * FROM books ORDER by isbn")
         items = self.c.fetchall() 
-        for item in items:
-            print(item)
         self.conn.commit()
+
+        return items#List of tuples 
 
     def get_book(self, isbn, title, author):
         #show something accurate
@@ -170,3 +149,6 @@ class Database:
             return "The stock has benn updated"
         except Exception as error:
             return "Something went wrong, please try again"
+
+library = Database("Library.db")
+library.show_database()

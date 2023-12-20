@@ -11,7 +11,7 @@ class Book:
 class User:
     loans = []
     def __init__(self, username):
-        self.username = username
+        self.username = user1name
 
     def myHash(self, text:str):
         hash=0
@@ -38,13 +38,13 @@ class User:
             for line in file:
                 existing_username, existing_password = line.strip().split(',')
                 if existing_username == username and existing_password.strip() == passwordHash:
-                    print(f"Welcome back, {username}!")
                     self.library = library.copy() 
                     return username
         print("Wrong username or password. Please try again.")
         return None
 
     def loan_out(self, book:Book):
+
         #Checks for the book in the users file of loans
         def create_file_if_not_exist(folder_path, file_name):
             file_path = os.path.join(folder_path, file_name)
