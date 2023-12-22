@@ -387,7 +387,7 @@ class App:
 
     def openAdminWindow(self):
         master = tk.Toplevel()
-        app = AdminPopUp(master)
+        app = AdminPopUp(master, self.name)
         master.mainloop()
     
     def openSignInWindow(self):

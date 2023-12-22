@@ -3,7 +3,7 @@ from tkinter import ttk, messagebox
 from database import Database, Book
 from PIL import Image,ImageTk
 
-class BookBrowsing:
+class AdminPopUp:
     def __init__(self, root, username):
         self.name = username
         self.root = root
@@ -73,16 +73,16 @@ class BookBrowsing:
         self.frame.pack(expand = True, fill="both")
 
         #Places the backround of the window
-        self.setBackround(self.frame, "background.png", 1300, 500)
+        self.setBackround(self.frame, "background.png", 1920, 1080)
        
 
         #Add book section
         self.addSection(self.frame)
-        self.frameAdd.place(relx=0.2, rely=0.1, anchor="n")
+        self.frameAdd.place(relx=0.2, rely=0.05, anchor="n")
 
         #Edit a book's details section
         self.editSection(self.frame)
-        self.frameEdit.place(relx=0.5, rely=0.1, anchor="n")
+        self.frameEdit.place(relx=0.5, rely=0.05, anchor="n")
     
     def setBackround(self, frame, image, width, height):
         #Sets up the backroound
@@ -356,6 +356,6 @@ class BookBrowsing:
         self.tableFill()
 
 if __name__ == "__main__":
-    root  = tk.Tk()
-    app = BookBrowsing(root, "admin")
+    root = tk.Tk()
+    app = AdminPopUp(root, "admin")
     root.mainloop()
