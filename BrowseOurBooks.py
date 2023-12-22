@@ -13,6 +13,11 @@ class BookBrowsing:
         
         #Initialize the library
         self.library = Database("Library.db")
+        
+        #Top frame:
+        self.frameTop = tk.Frame(self.root, bg="#D2B48C")
+        self.frameTop.pack(fill="both")
+
         #Style of the table:
         self.tableStyle = ttk.Style()
         self.tableStyle.configure("Treeview", 
@@ -23,13 +28,20 @@ class BookBrowsing:
         self.tableStyle.configure("Treeview.Heading", 
             font=('Calibri', 13,'bold'))
         self.tableStyle.layout("Treeview", [('Treeview.treearea', {'sticky': 'nswe'})])
+        self.tableStyle.map("Treeview", background=[("selected", "green")])
 
-        #Main frame for the table tree
-        self.frameTable = tk.Frame(self.root, bg="#D2B48C")
-        self.frameTable.pack(fill="both")
+        #Frame for the table tree
+        self.frameTable = tk.Frame(self.frameTop, bg="#D2B48C")
+        self.frameTable.pack()
 
-        self.table = ttk.Treeview(self.frameTable)
+        #Table scrollbar:
+        self.tableScroll = tk.Scrollbar(self.frameTable)
+        self.tableScroll.pack(side="right", fill="y", pady=20)
+        
 
+        self.table = ttk.Treeview(self.frameTable, yscrollcommand=self.tableScroll.set)
+        self.tableScroll.configure(command=self.table.yview)
+        self.table.bind("<<TreeviewSelect>>", self.table_on_select)
         #Define the columns of the table:
         self.table["columns"] = ("ISBN", "Title", "Author", "Section", "Stock")
         
@@ -51,9 +63,9 @@ class BookBrowsing:
         
         #Fills up the table with database data
         self.tableFill()
-        self.table.pack(pady=20)
+        self.table.pack(pady=20, fill="y")
 
-        self.refreshButton = tk.Button(self.frameTable, text="⟳", command= self.refresh_table)
+        self.refreshButton = tk.Button(self.frameTop, text="⟳", command= self.refresh_table)
         self.refreshButton.pack()
         #Secondary frame to handle the buttons and the user interface
         #of the changest to the table and the database
@@ -97,6 +109,22 @@ class BookBrowsing:
         if book: isFound = True
 
         return isFound, book
+
+    def table_on_select(self, event):
+        try:
+            selectedBook = self.table.selection()[0]  # Get the ID of the selected book
+            bookValues = self.table.item(selectedBook, "values") #Extracts it's value
+        except Exception as error:
+            print(str(error))
+            return
+
+        try:
+            for index, entry in enumerate(self.editBookEntries):
+                entry.delete(0,"end")
+                entry.insert(0, bookValues[index])
+        except Exception as error:
+            for index, entry in enumerate(self.editBookEntries):
+                entry.delete(0,"end")
 
     def tableFill(self):
         book_list = self.library.show_database()
@@ -240,12 +268,12 @@ class BookBrowsing:
         self.submitButton.pack(side="left")
 
         #Submit Button
-        self.submitButton = tk.Button(self.frameEditButtons, text="Clear", 
+        self.clearButton = tk.Button(self.frameEditButtons, text="Clear", 
                                     pady=15, padx=15,
                                     font=("Helvetica", 20),
                                     bg="#CFCFCF",
                                     command=lambda: self.clear_text(self.editBookEntries))
-        self.submitButton.pack(side="right")
+        self.clearButton.pack(side="right")
 
         #Error-Label
         self.errorLabelEdit = tk.Label(self.frameEditError, text="", bg="#D2B48C")
