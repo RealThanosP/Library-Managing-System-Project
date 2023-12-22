@@ -151,4 +151,3 @@ class Database:
             return "Something went wrong, please try again"
 
 library = Database("Library.db")
-library.show_database()

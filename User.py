@@ -11,7 +11,7 @@ class Book:
 class User:
     loans = []
     def __init__(self, username):
-        self.username = user1name
+        self.username = username
 
     def myHash(self, text:str):
         hash=0
@@ -40,7 +40,7 @@ class User:
                 if existing_username == username and existing_password.strip() == passwordHash:
                     self.library = library.copy() 
                     return username
-        print("Wrong username or password. Please try again.")
+        print("Wrong username or password.\nPlease try again.")
         return None
 
     def loan_out(self, book:Book):

@@ -112,7 +112,7 @@ class SignInPopUpApp:
         name, password = updateEntries()
         user = User(name)
         if user.sign_in([], name, password) == None or name == "Username: ":
-            self.errorLabel.config(text="Wrong username or password. Please try again.")
+            self.errorLabel.config(text="Wrong username or password.\nPlease try again.")
         else:
             self.root.destroy()
             self.name = name
@@ -158,6 +158,10 @@ class App:
         self.root.title("Library Management System") 
         self.root.geometry("600x500-300+100")
         self.root.resizable(False,False)
+
+        #Initiate the user info and the database state:
+        self.user = User(self.name)
+        self.library = Database("Library.db")
 
         #Usefull placeholders and lists
         self.BookAttributes = ("Isbn:", "Title:", "Author:", "Section:", "Stock:")
@@ -296,31 +300,29 @@ class App:
         '''Allows the find button to find the book ot be loaned out'''
         title = self.loanBookEntries[0].get().strip(" ")
         author = self.loanBookEntries[1].get().strip(" ")
-        #Initialize the database
-        library = Database("Library.db")
         
         #Search for the book:
-        found_book = library.get_book(0, title, author)#tuple
+        found_book = self.library.get_book(0, title, author)#tuple
+        
         if found_book == None:
             self.errorLabelLoan.config(text="The book you ask for is not in our database")  
             return
+        
         #Set the book
         book = Book(*found_book)
 
-        #Initialize the user that enters 
-        user = User(self.name)
-        loan_book = user.loan_out(book)
-
-        if loan_book == None:
-            self.errorLabelLoan.config(text="You already have the book loaned out")
-            return
-
         if book.stock > 0:
+            loan_book = self.user.loan_out(book)
+
+            if loan_book == None:
+                self.errorLabelLoan.config(text="You already have the book loaned out")
+                return
+
             book.stock -= 1
-            library.updateInfo(book.isbn, book.title, book.author, book.section, book.stock)
+            self.library.updateInfo(book.isbn, book.title, book.author, book.section, book.stock)
             self.errorLabelLoan.config(text=f"You loaned out {book.title} by {book.author}.\nEnjoy it")
         else:
-            self.errorLabelLoan.config(text=loan_book)#f"We are sorry but {book.title} by {book.author}\n is out of stock")
+            self.errorLabelLoan.config(text=f"We are sorry but, {book.title} by {book.author} is out of stock")#f"We are sorry but {book.title} by {book.author}\n is out of stock")
         
     def openBookList(self):
         root = tk.Toplevel()
@@ -396,5 +398,5 @@ class App:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = SignInPopUpApp(root)
+    app = App(root, "admin")
     root.mainloop()
