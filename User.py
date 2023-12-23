@@ -57,16 +57,17 @@ class User:
 
         with open(f"UserFiles/{self.username}.txt", "r", encoding="utf-8") as file:
             for line in file:
-                data = line.strip().split(",")
-                if data == [str(book.isbn), book.title, book.author, str(book.section)]:
-                    return None        
+                if data:
+                    data = line.strip().split("\t")
+                    if data == [str(book.isbn), book.title, book.author, str(book.section)]:
+                        return None        
                     
         loan_info = f"Book '{book.title}' by '{book.author}' loaned out successfully by '{self.username}'\n"
         with open("MovesLog.txt", "a", encoding="utf-8") as file:
             file.write(loan_info)
         
         with open(f"UserFiles/{self.username}.txt", "a", encoding="utf-8") as file:
-            file.write(f"{book.isbn},{book.title},{book.author},{book.section}\n")
+            file.write(f"{book.isbn}\t{book.title}\t{book.author}\t{book.section}\n")
 
         return "Done"
         

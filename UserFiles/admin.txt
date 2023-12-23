@@ -1,4 +1,1 @@
-123,Bible,God,100
-1234,Harry Potter,JK Rowling,201
-123,Bible,God,100
-1231,Witcher,Don't Know,201
+1231	Witcher	Don't Know	201
