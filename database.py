@@ -28,7 +28,8 @@ class Book:
         self.author = str(author)
         self.section = int(section)
         self.stock = int(stock)
-    
+    def __str__(self) -> str:
+        return f"({self.isbn}, {self.title}, {self.author}, {self.section}, {self.stock})"
 class Database:
     '''Handles all the functionalities of the database of books of the app'''
     def __init__(self, name):

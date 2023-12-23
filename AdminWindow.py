@@ -67,6 +67,7 @@ class AdminPopUp:
 
         self.refreshButton = tk.Button(self.frameTop, text="⟳", command= self.refresh_table)
         self.refreshButton.pack()
+        
         #Secondary frame to handle the buttons and the user interface
         #of the changest to the table and the database
         self.frame = tk.Frame(self.root, bg="black")
@@ -133,7 +134,6 @@ class AdminPopUp:
             #Inserts the values
             self.table.insert("", "end", value=book)
 
-    #Add Book Frame
     def addSection(self, frame):
         #Main frame:
         self.BookAttributes = ("Isbn:", "Title:", "Author:", "Section:", "Stock:")
@@ -217,7 +217,6 @@ class AdminPopUp:
         except ValueError:
             self.errorLabelAdd.config(text="The data you entered are invalid, Try again: ")
             
-    #Edit Book Frame
     def editSection(self, frame):
         self.editBookEntries = []
 
@@ -348,6 +347,7 @@ class AdminPopUp:
 
         if entryList == self.editBookEntries:
             self.errorLabelEdit.config(text="Text successfully cleared")
+
     def refresh_table(self):
         # Clear existing treeview content
         for item in self.table.get_children():

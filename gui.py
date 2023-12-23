@@ -7,9 +7,10 @@ from User import User
 from SignUp import SignUpPopUpApp
 from database import Book, Database
 from SeeYourBooks import BookDisplay
+from BrowseLibrary import BrowseLibrary
 
 class SignInPopUpApp:
-        
+    '''Small window that handles the signIn/Up process for the users of the library'''
     def __init__(self, root):
         self.name = ""
         self.root = root
@@ -34,7 +35,7 @@ class SignInPopUpApp:
         #Frame for the bottom text
         self.signUpSection(self.frame)
         self.frameSignUp.place(relx=0.5, rely=0.9, anchor="center")
-    #Sign in section:
+
     def signInSection(self, frame):
         '''Handles the visible part where you can sign in to the platform'''
         #Main frame
@@ -213,8 +214,10 @@ class App:
                             text="Browse...", 
                             font=("Helvetica, 15"),
                             bg="#CFCFDF",
-                            padx=15,pady=15,)
+                            padx=15,pady=15,
+                            command=self.openBrowseWindow)
         self.browseBooksButton.place(relx=0.8, rely=0.9, anchor="s")
+
         #Decides weather to place a button to access the database
         if self.name in self.adminNames:
             self.changeLibraryButton = tk.Button(self.frame, 
@@ -235,7 +238,6 @@ class App:
         self.backround.create_image(0, 0, image=self.bg, anchor="nw")
         self.backround.place(x=0, y=0, relwidth=1, relheight=1)
     
-    #Loan Book Frame
     def LoanSection(self, frame):
         self.loanBookEntries = []
         #Defines the main frame
@@ -329,7 +331,6 @@ class App:
         app = BookDisplay(root, self.name)
         root.mainloop
 
-    #Return Book Frame
     def ReturnSection(self, frame):
         #Main Frame
         self.returnBookEntries = []
@@ -394,6 +395,13 @@ class App:
         self.root.destroy()
         root = tk.Tk()
         app = SignInPopUpApp(root)
+        root.mainloop()
+
+    def openBrowseWindow(self):
+        name = self.name
+        self.root.destroy()
+        root = tk.Tk()
+        app = BrowseLibrary(root, name)
         root.mainloop()
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ class Book:
         self.stock = int(stock)
 
 class User:
-    loans = []
+
     def __init__(self, username):
         self.username = username
 
