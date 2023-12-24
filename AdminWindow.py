@@ -216,6 +216,8 @@ class AdminPopUp:
         #Just makes sure isbn and the remaining items are integers:
         except ValueError:
             self.errorLabelAdd.config(text="The data you entered are invalid, Try again: ")
+        
+        self.refresh_table()
             
     def editSection(self, frame):
         self.editBookEntries = []
@@ -286,7 +288,6 @@ class AdminPopUp:
         self.frameEditError.grid(row=3,column=0,columnspan=2, pady=(10,0))
     
     def editBook(self):
-
         def updateEntries(book):
             #Deletes whatever you wrote
             for i, entry in enumerate(self.editBookEntries):
@@ -305,6 +306,7 @@ class AdminPopUp:
                 entry.delete(0, "end")
             self.errorLabelEdit.config(text="The book was not found")
 
+        
     def submitChanges(self):
         """To be changed with the addition of the SQLite database"""
         #Gets the inputs form the entries
@@ -325,7 +327,7 @@ class AdminPopUp:
         library = Database("Library.db")
         error = library.updateInfo(isbn, title, author, section, stock)
         self.errorLabelEdit.config(text=error)
-        self.tableFill()
+        self.refresh_table()
 
     def sort_column(self, column, reverse):
         if column in ("Stock", "ISBN", "Section"):

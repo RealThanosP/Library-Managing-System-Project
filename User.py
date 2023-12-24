@@ -40,55 +40,61 @@ class User:
                 if existing_username == username and existing_password.strip() == passwordHash:
                     self.library = library.copy() 
                     return username
-        print("Wrong username or password.\nPlease try again.")
         return None
 
-    def loan_out(self, book:Book):
+    #Checks for the book in the users file of loans
+    def create_file_if_not_exist(self, folder_path, file_name):
+        file_path = os.path.join(folder_path, file_name)
+        if not os.path.exists(file_path):
+            # Create the file if it doesn't exist
+            with open(file_path, 'w'):
+                pass  # Empty context manager to create the file
+    
+    def delete_line_from_file(self, file_path, line_to_delete):
+        # Read all lines from the file
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
 
-        #Checks for the book in the users file of loans
-        def create_file_if_not_exist(folder_path, file_name):
-            file_path = os.path.join(folder_path, file_name)
-            if not os.path.exists(file_path):
-                # Create the file if it doesn't exist
-                with open(file_path, 'w'):
-                    pass  # Empty context manager to create the file
+        # Remove the specified line
+        lines = [line for line in lines if line.strip() != line_to_delete.strip()]
 
-        create_file_if_not_exist("UserFiles", f"{self.username}.txt") 
+        # Write the updated content back to the file
+        with open(file_path, 'w') as file:
+            file.writelines(lines)
 
+    def loan_out(self, book:Book): 
+        self.create_file_if_not_exist("UserFiles", f"{self.username}.txt")
+        #If the book is already in the user's txt it's not loaned out
         with open(f"UserFiles/{self.username}.txt", "r", encoding="utf-8") as file:
             for line in file:
+                data = line.strip().split("\t\t")
                 if data:
-                    data = line.strip().split("\t")
                     if data == [str(book.isbn), book.title, book.author, str(book.section)]:
-                        return None        
+                        return None
                     
-        loan_info = f"Book '{book.title}' by '{book.author}' loaned out successfully by '{self.username}'\n"
+        loan_info = f"'{book.title} by {book.author}' loaned out by '{self.username}'\n"
+        
+        #Logs the loan info into a seperate file
         with open("MovesLog.txt", "a", encoding="utf-8") as file:
             file.write(loan_info)
-        
+
+        #Add the book's info into the user's file
         with open(f"UserFiles/{self.username}.txt", "a", encoding="utf-8") as file:
-            file.write(f"{book.isbn}\t{book.title}\t{book.author}\t{book.section}\n")
+            file.write(f"{book.isbn}\t\t{book.title}\t\t{book.author}\t\t{book.section}\n")
 
         return "Done"
         
-    def return_in(self, title, author):
-        for loan_info in self.loans:
-            if loan_info['book']['title'] == title and loan_info['book']['author'] == author:
-                if loan_info['loaned_by'] == self.username:
-                    book = loan_info['book']
-                    book['stock'] += 1
-                    self.loans.remove(loan_info)
-                    print(f"Book '{title}' by {author} returned successfully by {self.username}")
-                    return True
-                else:
-                    print(f"You can't return a book loaned by another user.")
-                    return False
-        print(f"Book '{title}' by {author} not found in the user's loans.")
-        return False
+    def return_in(self, book:Book):
+        self.create_file_if_not_exist("UserFiles", f"{self.username}.txt")
+        with open(f"UserFiles/{self.username}.txt", "r", encoding="utf-8") as file:
+            for line in file:
+                data = line.strip().split("\t\t")
+                if data:
+                    if data == [str(book.isbn), book.title, book.author, str(book.section)]:
+                        self.delete_line_from_file(f"UserFiles/{self.username}.txt",line)
 
-    def display_loans(self):
-        print(f"{self.username}'s Loans:")
-        for loan_info in self.loans:
-            book = loan_info['book']
-            print(f"Title: {book['title']}, Author: {book['author']}, Loaned by: {loan_info['loaned_by']}")
+        returnInfo = f"'{book.title} by {book.author}' returned in by '{self.username}'\n"
+        with open("MovesLog.txt", "a", encoding="utf-8") as file:
+            file.write(returnInfo)
+
 

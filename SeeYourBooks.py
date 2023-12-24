@@ -25,7 +25,7 @@ class BookDisplay:
     def tableFill(self):
         with open(f"UserFiles/{self.name}.txt", "r", encoding="utf-8") as file:
             for line in file:
-                line = line.strip().split(",")
+                line = line.strip().split("\t\t")
                 self.tree.insert("", "end", value=line)
 
     def sort_column(self, column, reverse):

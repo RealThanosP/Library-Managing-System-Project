@@ -4,6 +4,7 @@ from database import Database, Book
 from PIL import Image, ImageTk
 from User import User
 import os
+
 class BrowseLibrary:
     def __init__(self, root, username):
         self.name = username
@@ -40,7 +41,15 @@ class BrowseLibrary:
                                     command=self.loan_book)
         self.loanButton.place(relx=0.15, rely=0.12, anchor="n")
 
-
+        #Return Button
+        self.returnButton = tk.Button(self.frame,
+                                      text="Return Selected",
+                                      font=("Helvetica", 20),
+                                      padx=15,pady=15,
+                                      border=0,
+                                      bg="#C3C3C3",
+                                      command=self.return_book)
+        self.returnButton.place(relx=0.15, rely=0.3, anchor="n")
 
         #Table frame for the already owned books
         self.frameUser = tk.Frame(self.frame)
@@ -75,9 +84,6 @@ class BrowseLibrary:
         self.tableUserFill()
         self.tableUser.pack()
 
-
-
-
         #Error label
         self.errorLabel = tk.Label(self.frame, text="", bg="#D2B48C")
         self.errorLabel.place(relx=0.5, rely=0.9, anchor="s")
@@ -86,6 +92,14 @@ class BrowseLibrary:
         # Table Frame
         self.frameTable = tk.Frame(frame, bg="#D2B48C")
         self.frameTable.pack()
+
+        #Button to sign out
+        self.backButton = tk.Button(frame, 
+                                       text="↩Back to Main Menu", 
+                                       font=("Helvetica", 15), 
+                                       bg="#CFCFDF",
+                                       command=self.openSignInWindow)
+        self.backButton.place(relx=0.01, rely=0.05, anchor="w")
 
         #Style of the table:
         self.tableStyle = ttk.Style()
@@ -134,7 +148,7 @@ class BrowseLibrary:
                                        bg="#C3C3C3",
                                        border=0,
                                        padx=10,pady=10,
-                                       command=self.refresh_table)
+                                       command=self.refresh_tables)
         self.refreshButton.pack()
 
     def tableFill(self):
@@ -184,7 +198,7 @@ class BrowseLibrary:
         self.backround.create_image(0, 0, image=self.bg, anchor="nw")
         self.backround.pack(fill="both", expand=True)
     
-    def refresh_table(self):
+    def refresh_tables(self):
         for book in self.table.get_children():
             self.table.delete(book)
         
@@ -203,9 +217,10 @@ class BrowseLibrary:
             self.errorLabel.config(text="Please select a book to loan out")
             print(str(error))
             return
+        
         for index, selection in enumerate(selected_bookID):
-            selected_book = self.table.item(selected_bookID[index], "values")   
-
+            try: selected_book = self.table.item(selected_bookID[index], "values")   
+            except Exception as error: print(str(error))
             book = Book(*selected_book)
             
             found_book = self.library.get_book(book.isbn, "", "")
@@ -219,15 +234,53 @@ class BrowseLibrary:
                 loaned_book = self.user.loan_out(book)
 
                 if loaned_book == None:
-                    self.errorLabel.config(text="You already have the book loaned out")
+                    self.errorLabel.config(text="You already have one of the selected book loaned out")
                     return
 
                 book.stock -= 1
                 self.library.updateInfo(book.isbn, book.title, book.author, book.section, book.stock)
                 before_text = self.errorLabel.cget("text")
                 self.errorLabel.config(text=f"{before_text}\nYou loaned out {book.title} by {book.author}. Enjoy it!!\n")
+                self.refresh_tables()
             else:
                 self.errorLabel.config(text=f"We are sorry but, {book.title} by {book.author} is out of stock.")     
+
+    def return_book(self):
+        '''Return the loaned out books to the library'''
+        try:
+            selectionID = self.tableUser.selection()
+        except Exception as error:
+            self.errorLabel.config(text="Plese select a book to return")
+            print(str(error))
+            return
+
+        for index, selection in enumerate(selectionID):
+            try: selected_book = self.tableUser.item(selectionID[index], "values")   
+            except Exception as error: 
+                print(str(error))
+                return
+            
+            book = Book(*selected_book, 0)
+
+            found_book = self.library.get_book(book.isbn, "", "")
+
+            book = Book(*found_book)
+
+            if found_book == None:
+                self.errorLabel.config(text="Please select a book to return")
+                return
+            
+            returned_book = self.user.return_in(book)
+
+            book.stock += 1
+            self.library.updateInfo(book.isbn, book.title, book.author, book.section, book.stock)
+            self.errorLabel.config(text=f"You successfully returned {book.title} by {book.author}.\nThank you for the preference")
+            self.refresh_tables()
+
+    def openMainMenu(self):
+        self.root.destroy()
+        app = App(root, self.name)
+        root.mainloop()
 
 if __name__ == "__main__":
     root = tk.Tk()
