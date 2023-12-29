@@ -32,6 +32,8 @@ class SignInPopUpApp:
         self.signInSection(self.frame)
         self.frameSignIn.pack(pady=(30,0))
 
+        self.root.bind('<Return>', lambda event: self.signIn(event))
+
         #Frame for the bottom text
         self.signUpSection(self.frame)
         self.frameSignUp.place(relx=0.5, rely=0.9, anchor="center")
@@ -86,7 +88,8 @@ class SignInPopUpApp:
 
         #Buttons
         #Sign In Button:
-        self.signInButton = tk.Button(self.frameButtons, text="Sign In", font=("Helvetica", 20), command=self.signIn)
+        self.signInButton = tk.Button(self.frameButtons, text="Sign In", font=("Helvetica", 20))
+        self.signInButton.bind("<Button-1>", lambda event: self.signIn(event))
         self.signInButton.pack(pady=(30,0))
 
         #Error Label
@@ -97,9 +100,8 @@ class SignInPopUpApp:
         self.frameEntries.grid(row=1, column=0, columnspan=2)
         self.frameButtons.grid(row=2, column=0, columnspan=2)
         self.errorLabel.grid(row=3, column=0, columnspan=2)
-        
-    def signIn(self):
-        def updateEntries():
+    
+    def updateEntries(self):
             #Gets the input:
             name = self.usernameEntry.get()
             password = self.passwordEntry.get()
@@ -109,10 +111,13 @@ class SignInPopUpApp:
             self.passwordEntry.delete(0, "end")
 
             return name, password
+    
+    def signIn(self, event):
         
-        name, password = updateEntries()
+        name, password = self.updateEntries()
+
         user = User(name)
-        if user.sign_in([], name, password) == None or name == "Username: ":
+        if user.sign_in(name, password) == None or name == "Username: ":
             self.errorLabel.config(text="Wrong username or password.\nPlease try again.")
         else:
             self.root.destroy()
@@ -288,7 +293,7 @@ class App:
         self.loanSubmitButton.pack(side="right", padx=(5,10))
 
         #Error Label
-        self.errorLabelLoan = tk.Label(self.frameLoanErrors, text="Error Label", bg="#D2B48C")
+        self.errorLabelLoan = tk.Label(self.frameLoanErrors, text="", bg="#D2B48C")
         self.errorLabelLoan.grid(row=5, column=0, columnspan=2, pady=1)
 
         #Places all the frames into the screen
@@ -300,9 +305,13 @@ class App:
     
     def loanBook(self):
         '''Allows the find button to find the book ot be loaned out'''
-        title = self.loanBookEntries[0].get().strip(" ")
-        author = self.loanBookEntries[1].get().strip(" ")
+        title = self.loanBookEntries[0].get()
+        author = self.loanBookEntries[1].get()
         
+        #Update the entries
+        for index, entry in enumerate(self.loanBookEntries):
+            entry.delete(0, "end")
+
         #Search for the book:
         found_book = self.library.get_book(0, title, author)#tuple
         
@@ -373,11 +382,12 @@ class App:
                                         text="Return", 
                                         pady=15, padx=15,
                                         font=("Helvetica", 20), 
-                                        bg="#CFCFDF")
+                                        bg="#CFCFDF",
+                                        command=self.returnBook)
         self.returnButton.pack()
 
         #Error Label
-        self.errorLabelReturn = tk.Label(self.frameReturn, text="ERROR", bg="#D2B48C")
+        self.errorLabelReturn = tk.Label(self.frameReturn, text="", bg="#D2B48C")
 
         #Places everything on the main frame
         self.frameReturnTitle.grid(row=0, column=0, columnspan=2)
@@ -385,6 +395,34 @@ class App:
         self.frameReturnEntries.grid(row=1, column=1, padx=10)
         self.frameReturnButton.grid(row=2, column=0, columnspan=2, pady=10)
         self.errorLabelReturn.grid(row=3, column=0, columnspan=2)
+
+    def returnBook(self):
+        '''Returns the book in the database'''
+        #Gets the details of the book:
+        title = self.returnBookEntries[0].get()
+        author = self.returnBookEntries[1].get()
+
+        #Update the entries
+        for index, entry in enumerate(self.returnBookEntries):
+            entry.delete(0, "end")
+
+        #Search for the book
+        found_book = self.library.get_book(0, title, author)
+
+        if found_book == None:
+            self.errorLabelReturn.config(text="Something went wrong please try returning your book\nthrough the 'Browse...' menu")
+            return 
+        
+        book = Book(*found_book)
+        returning_book = self.user.return_in(book)
+        if returning_book == None:
+            self.errorLabelReturn.config(text="You haven't loaned out the book to return it")
+            return
+        
+        book.stock += 1
+        self.library.updateInfo(book.isbn, book.title, book.author, book.section, book.stock)
+        self.errorLabelReturn.config(text=f"You returned '{book.title} by {book.author}' successfully")
+
 
     def openAdminWindow(self):
         master = tk.Toplevel()
@@ -670,7 +708,9 @@ class BrowseLibrary:
                 return
             
             returned_book = self.user.return_in(book)
-
+            if returned_book == None:
+                self.errorLabel.config(text="You haven't loaned out this book to return it.")
+                return
             book.stock += 1
             self.library.updateInfo(book.isbn, book.title, book.author, book.section, book.stock)
             self.errorLabel.config(text=f"You successfully returned {book.title} by {book.author}.\nThank you for the preference")

@@ -31,14 +31,13 @@ class User:
             file.write(f"\n{username},{passwordHash}")
         return "Signup successful!"
 
-    def sign_in(self, library, username, password):
+    def sign_in(self, username, password):
         passwordHash = self.myHash(password)
 
         with open("users.txt", "r") as file:
             for line in file:
                 existing_username, existing_password = line.strip().split(',')
                 if existing_username == username and existing_password.strip() == passwordHash:
-                    self.library = library.copy() 
                     return username
         return None
 
@@ -85,6 +84,7 @@ class User:
         return "Done"
         
     def return_in(self, book:Book):
+        deleted = False
         self.create_file_if_not_exist("UserFiles", f"{self.username}.txt")
         with open(f"UserFiles/{self.username}.txt", "r", encoding="utf-8") as file:
             for line in file:
@@ -92,9 +92,14 @@ class User:
                 if data:
                     if data == [str(book.isbn), book.title, book.author, str(book.section)]:
                         self.delete_line_from_file(f"UserFiles/{self.username}.txt",line)
-
-        returnInfo = f"'{book.title} by {book.author}' returned in by '{self.username}'\n"
-        with open("MovesLog.txt", "a", encoding="utf-8") as file:
-            file.write(returnInfo)
+                        deleted = True
+        if deleted:
+            #Captures the return only when the book is loaned out by the user
+            returnInfo = f"'{book.title} by {book.author}' returned in by '{self.username}'\n"
+            with open("MovesLog.txt", "a", encoding="utf-8") as file:
+                file.write(returnInfo)
+            return True
+        else:
+            return None
 
 
