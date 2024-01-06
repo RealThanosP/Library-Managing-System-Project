@@ -92,9 +92,13 @@ class SignUpPopUpApp:
             #Deletes the inputs:
             self.usernameEntry.delete(0, "end")
             self.passwordEntry.delete(0, "end")
-
+            
             return name, password
+        
         name, password = updateEntries()
+        if "," in name:
+            self.errorLabel.config(text="Your username cannot contain a comma (,)")
+            return
         
         if name and password:
             user = User(name)
